@@ -1,0 +1,17 @@
+{
+  "name": "@tokens-taken/shared-types",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/auth/auth.types.ts",
+    "./invoice": "./src/invoice/invoice.types.ts",
+    "./transaction": "./src/transaction/transaction.types.ts",
+    "./currency": "./src/currency/currency.types.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

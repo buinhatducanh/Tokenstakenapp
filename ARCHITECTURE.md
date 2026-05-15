@@ -8,6 +8,55 @@
 
 ---
 
+## 🗂️ MONOREPO STRUCTURE
+
+```
+Tokenstakenapp/
+├── apps/
+│   ├── frontend/          # Next.js application
+│   └── backend/           # NestJS API server
+├── packages/
+│   ├── shared-types/      # Shared TypeScript types (cross-package contracts)
+│   ├── common-utils/       # Pure utility functions
+│   └── db/                # Prisma schema + migrations
+├── features/              # Domain modules (Task 1-6)
+│   ├── auth/              # Task 1: Magic Link + WebAuthn
+│   ├── invoice/           # Task 2: Invoice CRUD + OCR + Bulk
+│   ├── transaction/       # Task 3: Double-entry ledger
+│   ├── dashboard/         # Task 4: Stats + widgets
+│   ├── command-palette/   # Task 5: ⌘K overlay + shortcuts
+│   └── reports/          # Task 6: P&L, Cash Flow, export
+├── docs/
+│   ├── architecture/      # Architecture diagrams + schemas
+│   ├── rules/            # Task isolation rules
+│   └── guidelines/       # Coding standards
+├── scripts/              # DevOps & build scripts
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│   └── e2e/
+├── package.json          # Root workspace config (pnpm workspaces)
+├── pnpm-workspace.yaml   # Workspace package list
+├── tsconfig.base.json    # Shared TypeScript config
+└── CLAUDE.md            # AI assistant context file
+```
+
+**Dependency Rules (enforced):**
+```
+apps/frontend  ──────►  features/*  ──────►  packages/shared-types
+     │                        │                    │
+     │                        │                    ├──► packages/common-utils
+     └──► packages/shared-types (direct)
+apps/backend   ──────►  features/*  ──────►  packages/db (Prisma)
+     │                        │
+     │                        └──► packages/shared-types
+     └──► packages/common-utils
+```
+
+**Isolation: Features CANNOT import from other features.** All cross-feature communication goes through `packages/shared-types`. See `docs/rules/TASK_ISOLATION_RULES.md` for full rules.
+
+---
+
 ## 🏗️ 1. SYSTEM ARCHITECTURE DIAGRAM
 
 ```
@@ -876,7 +925,7 @@ const { mutate } = useMutation({
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2026-05-14  
-**Author:** AI Software Architect  
-**Status:** Awaiting Client Review ✅
+**Document Version:** 2.0 — Updated with Monorepo Architecture
+**Last Updated:** 2026-05-15
+**Author:** AI Software Architect
+**Status:** Active Development ✅

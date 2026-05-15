@@ -1,2 +1,21 @@
+# ============================================================
+# TOKENSTAKEN — Root Workspace Configuration
+# ============================================================
+
 packages:
-  - '.'
+  # Applications
+  - "apps/frontend"
+  - "apps/backend"
+
+  # Shared packages
+  - "packages/shared-types"
+  - "packages/common-utils"
+  - "packages/db"
+
+  # Features (each is an independent buildable unit)
+  - "features/auth"
+  - "features/invoice"
+  - "features/transaction"
+  - "features/dashboard"
+  - "features/command-palette"
+  - "features/reports"

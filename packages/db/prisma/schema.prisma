@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id           String               @id @default(cuid())
+  name         String
+  slug         String               @unique
+  plan         Plan                 @default(FREE)
+  settings     Json                 @default("{}")
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  accounts     Account[]
+  auditLogs    AuditLog[]
+  invoices     Invoice[]
+  members      OrganizationMember[]
+  transactions Transaction[]
+
+  @@index([slug])
+}
+
+model User {
+  id                      String                @id @default(cuid())
+  email                   String                @unique
+  displayName             String?
+  avatarUrl               String?
+  locale                  String                @default("en")
+  timezone                String                @default("UTC")
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  lastLoginAt             DateTime?
+  magicLinkToken          String?               @unique
+  magicLinkExpires        DateTime?
+  auditLogs               AuditLog[]
+  invoiceAssignments      InvoiceAssignment[]
+  organizationMemberships OrganizationMember[]
+  sessions                Session[]
+  transactionApprovals    TransactionApproval[]
+  webAuthnCredential      WebAuthnCredential?
+
+  @@index([email])
+  @@index([magicLinkToken])
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  userId         String
+  organizationId String
+  role           OrgRole      @default(MEMBER)
+  invitedAt      DateTime     @default(now())
+  joinedAt       DateTime?
+  isActive       Boolean      @default(true)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  deviceInfo   Json?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model WebAuthnCredential {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  credentialId String   @unique
+  publicKey    String
+  counter      BigInt
+  deviceType   String?
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id             String         @id @default(cuid())
+  organizationId String
+  code           String
+  name           String
+  type           AccountType
+  currency       String         @default("VND")
+  balance        Decimal        @default(0) @db.Decimal(20, 4)
+  isActive       Boolean        @default(true)
+  isSystem       Boolean        @default(false)
+  parentId       String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent         Account?       @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children       Account[]      @relation("AccountHierarchy")
+  journalEntries JournalEntry[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([type])
+}
+
+model Transaction {
+  id             String                @id @default(cuid())
+  organizationId String
+  reference      String
+  type           TransactionType
+  status         TransactionStatus     @default(PENDING)
+  description    String?
+  date           DateTime              @default(now())
+  amount         Decimal               @db.Decimal(20, 4)
+  currency       String                @default("VND")
+  exchangeRate   Decimal               @default(1) @db.Decimal(20, 8)
+  metadata       Json                  @default("{}")
+  approvedAt     DateTime?
+  approvedById   String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  attachments    Attachment[]
+  invoiceLinks   InvoiceTransaction[]
+  journalEntries JournalEntry[]
+  organization   Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  approvals      TransactionApproval[]
+
+  @@unique([organizationId, reference])
+  @@index([organizationId])
+  @@index([date])
+  @@index([status])
+}
+
+model JournalEntry {
+  id            String      @id @default(cuid())
+  transactionId String
+  accountId     String
+  debit         Decimal     @default(0) @db.Decimal(20, 4)
+  credit        Decimal     @default(0) @db.Decimal(20, 4)
+  description   String?
+  createdAt     DateTime    @default(now())
+  account       Account     @relation(fields: [accountId], references: [id])
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@index([accountId])
+}
+
+model TransactionApproval {
+  id            String         @id @default(cuid())
+  transactionId String
+  userId        String
+  action        ApprovalAction
+  comment       String?
+  decidedAt     DateTime       @default(now())
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id])
+
+  @@index([transactionId])
+}
+
+model Invoice {
+  id               String               @id @default(cuid())
+  organizationId   String
+  invoiceNumber    String
+  type             InvoiceType
+  status           InvoiceStatus        @default(DRAFT)
+  senderName       String
+  senderTaxCode    String?
+  senderAddress    String?
+  receiverName     String
+  receiverTaxCode  String?
+  receiverAddress  String?
+  subtotal         Decimal              @default(0) @db.Decimal(20, 4)
+  taxRate          Decimal              @default(0) @db.Decimal(5, 4)
+  taxAmount        Decimal              @default(0) @db.Decimal(20, 4)
+  total            Decimal              @default(0) @db.Decimal(20, 4)
+  currency         String               @default("VND")
+  dueDate          DateTime?
+  lineItems        Json                 @default("[]")
+  notes            String?
+  sourceFileUrl    String?
+  ocrExtracted     Json?
+  approvedAt       DateTime?
+  approvedById     String?
+  publishedAt      DateTime?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  attachments      Attachment[]
+  organization     Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignments      InvoiceAssignment[]
+  transactionLinks InvoiceTransaction[]
+
+  @@unique([organizationId, invoiceNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+model InvoiceAssignment {
+  id         String   @id @default(cuid())
+  invoiceId  String
+  userId     String
+  role       String   @default("reviewer")
+  assignedAt DateTime @default(now())
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([invoiceId, userId])
+}
+
+model InvoiceTransaction {
+  id            String      @id @default(cuid())
+  invoiceId     String
+  transactionId String
+  invoice       Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@unique([invoiceId, transactionId])
+}
+
+model Attachment {
+  id            String       @id @default(cuid())
+  fileName      String
+  fileSize      Int
+  mimeType      String
+  storageKey    String
+  url           String
+  thumbnailUrl  String?
+  uploadedById  String?
+  invoiceId     String?
+  transactionId String?
+  createdAt     DateTime     @default(now())
+  invoice       Invoice?     @relation(fields: [invoiceId], references: [id])
+  transaction   Transaction? @relation(fields: [transactionId], references: [id])
+
+  @@index([invoiceId])
+  @@index([transactionId])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String?
+  action         String
+  entityType     String
+  entityId       String
+  changes        Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [userId], references: [id])
+
+  @@index([organizationId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+  ACCOUNTANT
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+  ADJUSTMENT
+  JOURNAL
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum ApprovalAction {
+  APPROVE
+  REJECT
+  REQUEST_INFO
+}
+
+enum InvoiceType {
+  SALE
+  PURCHASE
+  EXPENSE
+  CREDIT
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  PUBLISHED
+  CANCELLED
+  OVERDUE
+}
