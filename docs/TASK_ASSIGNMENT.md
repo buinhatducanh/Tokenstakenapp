@@ -75,7 +75,7 @@
 
 ---
 
-### Task 4 — Dashboard (`features/dashboard/`) - member: Hữu
+### Task 4 — Dashboard (`features/dashboard/`) - member: Hậu
 
 **Sở hữu:**
 - `features/dashboard/src/` — widget, thẻ thống kê, layout dashboard
