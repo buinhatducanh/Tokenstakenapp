@@ -19,7 +19,7 @@
 
 ## RANH GIỚI SỞ HỮU (FILE OWNERSHIP)
 
-### Task 1 — Auth (`features/auth/`)
+### Task 1 — Auth (`features/auth/`) - member: Hân
 
 **Sở hữu:**
 - `features/auth/src/` — toàn bộ logic auth
@@ -36,7 +36,7 @@
 
 ---
 
-### Task 2 — Invoice (`features/invoice/`)
+### Task 2 — Invoice (`features/invoice/`) - member: Tiến
 
 **Sở hữu:**
 - `features/invoice/src/` — toàn bộ logic invoice
@@ -56,7 +56,7 @@
 
 ---
 
-### Task 3 — Transaction (`features/transaction/`)
+### Task 3 — Transaction (`features/transaction/`) - member: Anh Ngữ
 
 **Sở hữu:**
 - `features/transaction/src/` — toàn bộ logic giao dịch + sổ kép
@@ -75,7 +75,7 @@
 
 ---
 
-### Task 4 — Dashboard (`features/dashboard/`)
+### Task 4 — Dashboard (`features/dashboard/`) - member: Hữu
 
 **Sở hữu:**
 - `features/dashboard/src/` — widget, thẻ thống kê, layout dashboard
