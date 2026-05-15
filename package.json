@@ -34,6 +34,9 @@
     "typescript": "^5.7.0",
     "vitest": "^2.0.0"
   },
+  "prisma": {
+    "schema": "packages/db/prisma/schema.prisma"
+  },
   "pnpm": {
     "overrides": {
       "vite": "6.3.5"
