@@ -34,7 +34,7 @@ import {
   HttpStatus,
   HttpCode,
 } from "@nestjs/common";
-import { Response } from "express";
+import type { Response } from "express";
 
 // Import service — được inject qua module
 import { ReportService } from "./reports.service";
