@@ -81,6 +81,7 @@ const TRANSACTIONS: Transaction[] = [
     exchangeRate: "1",
     approvedAt: null,
     createdAt: "2026-05-16T14:00:00.000Z",
+    updatedAt: "2026-05-16T14:00:00.000Z",
   },
 ];
 
