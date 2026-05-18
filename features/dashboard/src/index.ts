@@ -1,6 +1,6 @@
-// Task 4: Dashboard Feature — Stats Cards, Charts, Recent Activity, Quick Actions
+// Task 4: Dashboard Feature - Stats Cards, Recent Activity, Quick Actions
 // Public API surface.
 
-export { DashboardService } from "./dashboard.service";
-export { StatCard, TransactionList, PendingApprovals, QuickActions } from "./components";
-export { useDashboardStats, useRecentTransactions, usePendingApprovals } from "./api/dashboard.hooks";
+export { useDashboardStats, usePendingApprovals, useRecentTransactions } from "./api/dashboard.hooks";
+export { DashboardView, PendingApprovals, QuickActions, StatCard, TransactionList } from "./components";
+export type { DashboardData, DashboardStat, StatTone } from "./dashboard.types";
