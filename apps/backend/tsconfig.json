@@ -1,0 +1,45 @@
+// {
+//     "compilerOptions": {
+//         "module": "commonjs",
+//         "target": "ES2021",
+//         "moduleResolution": "node",
+//         "baseUrl": ".",
+//         "experimentalDecorators": true,
+//         "emitDecoratorMetadata": true,
+//         "skipLibCheck": true,
+//         "strict": true,
+//         "paths": {
+//             "@tokens-taken/db": [
+//                 "../../packages/db/src"
+//             ],
+//             "@tokens-taken/feature-auth": [
+//                 "../../features/auth/src"
+//             ],
+//             "@tokens-taken/shared-types": [
+//                 "../../packages/shared-types/src"
+//             ],
+//             "@tokens-taken/common-utils": [
+//                 "../../packages/common-utils/src"
+//             ]
+//         }
+//     }
+// }
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "rootDir": "../../",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "paths": {
+      "@tokens-taken/db": ["../../packages/db/src"],
+      "@tokens-taken/feature-auth": ["../../features/auth/src"],
+      "@tokens-taken/shared-types": ["../../packages/shared-types/src"],
+      "@tokens-taken/common-utils": ["../../packages/common-utils/src"]
+    }
+  }
+}
