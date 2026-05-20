@@ -23,5 +23,7 @@ export type {
   JournalEntry,
   Account,
   AccountType,
+  CreateTransactionDTO,
+  TransactionApprovalAction
 } from "./transaction/transaction.types";
 export type { ApiResponse, PaginatedResponse } from "./api/api.types";

@@ -1,14 +1,21 @@
 // Error utilities — standard error types across the application
 
 export class AppError extends Error {
+  code: string;
+  statusCode: number;
+  metadata?: Record<string, unknown>;
+
   constructor(
     message: string,
-    public code: string,
-    public statusCode: number = 500,
-    public metadata?: Record<string, unknown>
+    code: string,
+    statusCode: number = 500,
+    metadata?: Record<string, unknown>
   ) {
     super(message);
     this.name = "AppError";
+    this.code = code;
+    this.statusCode = statusCode;
+    this.metadata = metadata;
   }
 }
 

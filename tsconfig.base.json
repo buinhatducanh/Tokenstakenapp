@@ -4,7 +4,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -28,7 +28,8 @@
       "@features/command-palette":  ["./features/command-palette/src/index.ts"],
       "@features/reports":         ["./features/reports/src/index.ts"],
       "@packages/shared-types":     ["./packages/shared-types/src/index.ts"],
-      "@packages/common-utils":     ["./packages/common-utils/src/index.ts"]
+      "@packages/common-utils":     ["./packages/common-utils/src/index.ts"],
+      "@/*":                        ["./src/*"]
     }
   }
 }

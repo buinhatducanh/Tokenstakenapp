@@ -1,6 +1,6 @@
 // Currency utilities — safe money math without floating-point errors
 
-import { Money } from "@tokens-taken/shared-types/currency/currency.types";
+import type { Money } from "@tokens-taken/shared-types";
 
 /**
  * Format money for display (e.g., ₫12,500,000)

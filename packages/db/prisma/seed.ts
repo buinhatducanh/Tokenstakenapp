@@ -62,18 +62,24 @@ async function main() {
     { code: "5200", name: "Chi phí quản lý", type: AccountType.EXPENSE,   isSystem: true },
   ];
 
+  const createdAccounts: Record<string, string> = {};
   for (const acc of defaultAccounts) {
-    await prisma.account.upsert({
+    const dbAcc = await prisma.account.upsert({
       where: { organizationId_code: { organizationId: org.id, code: acc.code } },
       update: {},
       create: { ...acc, organizationId: org.id },
     });
+    createdAccounts[acc.code] = dbAcc.id;
   }
   console.log(`✅ ${defaultAccounts.length} default accounts created`);
 
   // 5. Tạo sample invoice
-  const invoice = await prisma.invoice.create({
-    data: {
+  const invoice = await prisma.invoice.upsert({
+    where: {
+      organizationId_invoiceNumber: { organizationId: org.id, invoiceNumber: "INV-2026-000001" }
+    },
+    update: {},
+    create: {
       organizationId: org.id,
       invoiceNumber: "INV-2026-000001",
       type: InvoiceType.SALE,
@@ -94,6 +100,51 @@ async function main() {
     },
   });
   console.log(`✅ Sample invoice: ${invoice.invoiceNumber}`);
+
+  // 6. Tạo sample transactions & journal entries
+  const tx1 = await prisma.transaction.upsert({
+    where: { organizationId_reference: { organizationId: org.id, reference: "TXN-2026-001" } },
+    update: {},
+    create: {
+      organizationId: org.id,
+
+      reference: "TXN-2026-001",
+      type: TransactionType.INCOME,
+      amount: "10000000",
+      description: "Thanh toán tiền mặt cho hóa đơn",
+      date: new Date(),
+      status: TransactionStatus.APPROVED,
+      journalEntries: {
+        create: [
+          { accountId: createdAccounts["1000"], debit: "10000000", credit: "0" }, // Tăng tiền mặt
+          { accountId: createdAccounts["1200"], debit: "0", credit: "10000000" }, // Giảm phải thu
+        ]
+      }
+    }
+  });
+
+  const tx2 = await prisma.transaction.upsert({
+    where: { organizationId_reference: { organizationId: org.id, reference: "TXN-2026-002" } },
+    update: {},
+    create: {
+      organizationId: org.id,
+
+      reference: "TXN-2026-002",
+      type: TransactionType.TRANSFER,
+      amount: "50000000",
+      description: "Vay ngắn hạn ngân hàng",
+      date: new Date(),
+      status: TransactionStatus.PENDING,
+      journalEntries: {
+        create: [
+          { accountId: createdAccounts["1100"], debit: "50000000", credit: "0" }, // Tăng tiền gửi NH
+          { accountId: createdAccounts["2100"], debit: "0", credit: "50000000" }, // Tăng nợ vay
+        ]
+      }
+    }
+  });
+
+  console.log(`✅ Sample transactions created: ${tx1.reference}, ${tx2.reference}`);
 
   console.log("\n🎉 Seed completed!");
 }

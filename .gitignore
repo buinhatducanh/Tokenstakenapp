@@ -36,3 +36,6 @@ coverage/
 
 # Misc
 *.tsbuildinfo
+
+# User instructions
+stepbystep.md
