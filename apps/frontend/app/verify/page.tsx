@@ -1,163 +1,4 @@
 
-
-// "use client";
-
-// import { useEffect }
-//   from "react";
-
-// import {
-//   useSearchParams,
-//   useRouter,
-// } from "next/navigation";
-
-// export default function VerifyPage() {
-//   const params =
-//     useSearchParams();
-
-//   const router =
-//     useRouter();
-
-//   useEffect(() => {
-//     const token =
-//       params.get("token");
-
-//     const email =
-//       params.get("email");
-
-//     if (!token || !email)
-//       return;
-
-//     fetch(
-//       "http://localhost:3000/auth/verify",
-//       {
-//         method: "POST",
-
-//         credentials: "include",
-
-//         headers: {
-//           "Content-Type":
-//             "application/json",
-//         },
-
-//         body: JSON.stringify({
-//           email,
-//           token,
-//         }),
-//       },
-//     )
-//       .then((r) => r.json())
-
-//       .then((data) => {
-//         if (
-//           data.role === "OWNER" ||
-//           data.role === "ADMIN"
-//         ) {
-//           router.push("/admin");
-//         } else {
-//           router.push("/user");
-//         }
-//       });
-//   }, [params]);
-
-//   return (
-//     <div>Đang xác thực...</div>
-//   );
-// }
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { useSearchParams, useRouter } from "next/navigation";
-
-// export default function VerifyPage() {
-//   const params = useSearchParams();
-//   const router = useRouter();
-
-//   const [email, setEmail] = useState("");
-//   const [token, setToken] = useState("");
-//   const [loading, setLoading] = useState(false);
-//   const [role, setRole] = useState<string | null>(null);
-
-//   // 👉 CHỈ FILL DATA, KHÔNG AUTO LOGIN
-//   useEffect(() => {
-//     const t = params.get("token");
-//     const e = params.get("email");
-
-//     if (t) setToken(t);
-//     if (e) setEmail(e);
-//   }, [params]);
-
-//   // 👉 USER TỰ BẤM MỚI VERIFY
-//   const handleVerify = async () => {
-//     try {
-//       setLoading(true);
-
-//       const res = await fetch("http://localhost:3000/auth/verify", {
-//         method: "POST",
-//         credentials: "include",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           email,
-//           token,
-//         }),
-//       });
-
-//       const data = await res.json();
-
-//       if (!data.role) {
-//         alert("Token không hợp lệ!");
-//         return;
-//       }
-
-//       setRole(data.role);
-
-//       // 👉 redirect theo role
-//       if (data.role === "ADMIN" || data.role === "OWNER") {
-//         router.replace("/admin");
-//       } else {
-//         router.replace("/user");
-//       }
-//     } catch (err) {
-//       alert("Có lỗi xảy ra khi verify!");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div style={{ padding: 40, fontFamily: "system-ui" }}>
-//       <h2>🔐 Verify Magic Link</h2>
-
-//       <div style={{ marginTop: 20 }}>
-//         <p><b>Email:</b> {email || "Không có"}</p>
-//         <p><b>Token:</b> {token || "Không có"}</p>
-//       </div>
-
-//       <button
-//         onClick={handleVerify}
-//         disabled={loading || !token || !email}
-//         style={{
-//           marginTop: 20,
-//           padding: "10px 20px",
-//           background: "#7e22ce",
-//           color: "white",
-//           border: "none",
-//           borderRadius: 8,
-//           cursor: "pointer",
-//         }}
-//       >
-//         {loading ? "Đang xác thực..." : "Xác nhận đăng nhập"}
-//       </button>
-
-//       {role && (
-//         <p style={{ marginTop: 20 }}>
-//           👉 Role: <b>{role}</b>
-//         </p>
-//       )}
-//     </div>
-//   );
-// }
 "use client";
 
 import { useEffect, useState } from "react";
@@ -172,13 +13,30 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   const t = params.get("token");
+  //   const e = params.get("email");
+
+  //   if (t) setToken(t);
+  //   if (e) setEmail(e);
+  // }, [params]);
   useEffect(() => {
     const t = params.get("token");
     const e = params.get("email");
 
     if (t) setToken(t);
     if (e) setEmail(e);
-  }, [params]);
+
+    // 🚀 xoá query khỏi URL
+    if (window.location.search) {
+      window.history.pushState(
+        {},
+        "",
+        "/verify"
+      );
+    }
+  }, []);
+
 
   const handleVerify = async () => {
     try {
@@ -231,10 +89,10 @@ export default function VerifyPage() {
             <div className="info-box">{email || "Không có email"}</div>
           </div>
 
-          <div className="info-group">
+          {/* <div className="info-group">
             <label>Token</label>
             <div className="info-box token-box">{token || "Không có token"}</div>
-          </div>
+          </div> */}
 
           <button
             onClick={handleVerify}

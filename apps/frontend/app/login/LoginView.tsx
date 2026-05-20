@@ -1,239 +1,4 @@
 
-// "use client";
-
-// import { useState } from "react";
-// import { sendMagicLink } from "@/lib/api/auth";
-// import { Mail, Loader2 } from "lucide-react";
-
-// export default function LoginView() {
-//   const [email, setEmail] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [sent, setSent] = useState(false);
-
-//   const isValidEmail = (email: string) => {
-//     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-//   };
-
-//   const handleSend = async () => {
-//     try {
-//       setIsLoading(true);
-
-//       await sendMagicLink(email);
-
-//       setSent(true); // 👉 show message
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <>
-//       {/* 🔥 GIỮ NGUYÊN CSS CỦA MÀY */}
-//       <style jsx global>{`
-//         .login-page {
-//           min-height: 100vh;
-//           background: linear-gradient(135deg, #4c1d95 0%, #7e22ce 100%);
-//           display: flex;
-//           align-items: center;
-//           justify-content: center;
-//           padding: 20px;
-//           font-family: system-ui, -apple-system, sans-serif;
-//         }
-
-//         .login-card {
-//           background: white;
-//           width: 100%;
-//           max-width: 460px;
-//           border-radius: 32px;
-//           padding: 48px 40px;
-//           box-shadow: 0 25px 55px rgba(0, 0, 0, 0.22);
-//         }
-
-//         .header h1 {
-//           font-size: 31px;
-//           font-weight: 700;
-//           color: #1e2937;
-//           margin: 0 0 8px 0;
-//         }
-
-//         .header p {
-//           color: #64748b;
-//           font-size: 16.5px;
-//         }
-
-//         .input-label {
-//           font-size: 15px;
-//           font-weight: 600;
-//           color: #334155;
-//           margin: 28px 0 10px 0;
-//           display: block;
-//         }
-
-//         .input-wrapper {
-//           position: relative;
-//           width: 100%;
-//         }
-
-//         .input-field {
-//           width: 100%;
-//           padding: 16px 20px 16px 52px;
-//           border: 2px solid #e2e8f0;
-//           border-radius: 9999px;
-//           font-size: 16.5px;
-//           box-sizing: border-box;
-//         }
-
-//         .btn {
-//           width: 100%;
-//           margin-top: 24px;
-//           padding: 16px;
-//           font-size: 17px;
-//           font-weight: 600;
-//           border: none;
-//           border-radius: 9999px;
-//           background: linear-gradient(90deg, #c026d3, #db2777);
-//           color: white;
-//           cursor: pointer;
-//         }
-
-//         .icon {
-//           position: absolute;
-//           left: 20px;
-//           top: 50%;
-//           transform: translateY(-50%);
-//         }
-//       `}</style>
-
-//       <div className="login-page">
-//         <div className="login-card">
-//           <div className="header">
-//             <h1>Chào mừng trở lại</h1>
-//             <p>Đăng nhập bằng Magic Link</p>
-//           </div>
-
-//           {/* INPUT EMAIL */}
-//           <label className="input-label">Email</label>
-
-//           <div className="input-wrapper">
-//             <Mail className="icon" size={20} />
-//             <input
-//               className="input-field"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               placeholder="example@gmail.com"
-//             />
-//           </div>
-
-//           {/* BUTTON */}
-//           <button
-//             className="btn"
-//             disabled={!isValidEmail(email) || isLoading}
-//             onClick={handleSend}
-//           >
-//             {isLoading ? <Loader2 /> : "Gửi Magic Link"}
-//           </button>
-
-//           {/* SUCCESS MESSAGE */}
-//           {sent && (
-//             <p
-//               style={{
-//                 marginTop: 20,
-//                 textAlign: "center",
-//                 color: "#16a34a",
-//                 fontWeight: 600,
-//               }}
-//             >
-//               📩 Chú ý email của bạn để đăng nhập
-//             </p>
-//           )}
-//         </div>
-//       </div>
-//     </>
-//   );
-// }
-// "use client";
-
-// import { useState } from "react";
-// import { sendMagicLink } from "@/lib/api/auth";
-// import { Mail, Loader2 } from "lucide-react";
-
-// export default function LoginView() {
-//   const [email, setEmail] = useState("");
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [sent, setSent] = useState(false);
-
-//   const isValidEmail = (email: string) => {
-//     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-//   };
-
-//   const handleSend = async () => {
-//     if (!isValidEmail(email)) return;
-
-//     try {
-//       setIsLoading(true);
-//       await sendMagicLink(email);
-//       setSent(true);
-//     } catch (error) {
-//       alert("Có lỗi xảy ra khi gửi Magic Link!");
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="login-container">
-//       <div className="login-card">
-//         {/* Icon */}
-//         <div className="top-icon">
-//           <div className="icon-box">
-//             <Mail size={28} strokeWidth={2.5} />
-//           </div>
-//         </div>
-
-//         {/* Header */}
-//         <div className="login-header">
-//           <h1>Chào mừng trở lại</h1>
-//           <p>Đăng nhập bằng Magic Link</p>
-//         </div>
-
-//         {/* Input */}
-//         <div className="input-group">
-//           <label>Email</label>
-//           <div className="input-wrapper">
-//             <Mail className="input-icon" size={20} />
-//             <input
-//               type="email"
-//               className="input-field"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               placeholder="example@gmail.com"
-//             />
-//           </div>
-//         </div>
-
-//         {/* Button */}
-//         <button
-//           className="login-button"
-//           disabled={!isValidEmail(email) || isLoading}
-//           onClick={handleSend}
-//         >
-//           {isLoading ? (
-//             <>
-//               <Loader2 className="spin" size={22} />
-//               Đang gửi...
-//             </>
-//           ) : (
-//             "Gửi Magic Link"
-//           )}
-//         </button>
-
-//         {sent && (
-//           <p className="success-text">
-//             📩 Magic Link đã được gửi!<br />
-//             Vui lòng kiểm tra email của bạn.
-//           </p>
-//         )}
-//       </div>
 "use client";
 
 import { useState } from "react";
@@ -286,7 +51,7 @@ export default function LoginView() {
         </div>
 
         {/* INPUT */}
-        <div className="input-group">
+        {/* <div className="input-group">
           <label>Email</label>
 
           <div className="input-wrapper">
@@ -301,6 +66,36 @@ export default function LoginView() {
               disabled={isLoading} // ✔ khóa input khi gửi
             />
           </div>
+        </div> */}
+        <div className="input-group">
+          <label>Email</label>
+
+          <div className="input-wrapper">
+            <Mail className="input-icon" size={20} />
+
+            <input
+              type="email"
+              className="input-field"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@gmail.com"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/*  validate email */}
+          {email && !isValidEmail(email) && (
+            <p
+              style={{
+                color: "#ef4444",
+                fontSize: "14px",
+                marginTop: "8px",
+                marginLeft: "5px",
+              }}
+            >
+              Email không đúng định dạng
+            </p>
+          )}
         </div>
 
         {/* BUTTON */}
@@ -322,7 +117,7 @@ export default function LoginView() {
         {/* SUCCESS MESSAGE */}
         {sent && (
           <p className="success-text">
-            📩 Magic Link đã được gửi!<br />
+            Magic Link đã được gửi!<br />
             Vui lòng kiểm tra email của bạn.
           </p>
         )}

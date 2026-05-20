@@ -63,6 +63,24 @@ export class AuthController {
       },
     );
 
+    res.cookie(
+      'role',
+      result.role,
+      {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'lax',
+        maxAge:
+          7 *
+          24 *
+          60 *
+          60 *
+          1000,
+      },
+    );
+
+
+
     return {
       success: true,
       role: result.role,
@@ -71,16 +89,16 @@ export class AuthController {
 
 
   @Post('logout')
-logout(@Res({ passthrough: true }) res: Response) {
-  res.clearCookie('token', {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: false,
-    path: '/', // 👈 QUAN TRỌNG
-  });
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+      path: '/', // 👈 QUAN TRỌNG
+    });
 
-  return {
-    success: true,
-  };
-}
+    return {
+      success: true,
+    };
+  }
 }

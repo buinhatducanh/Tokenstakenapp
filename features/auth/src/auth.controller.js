@@ -36,6 +36,16 @@ let AuthController = class AuthController {
                 60 *
                 1000,
         });
+        res.cookie('role', result.role, {
+            httpOnly: false,
+            secure: false,
+            sameSite: 'lax',
+            maxAge: 7 *
+                24 *
+                60 *
+                60 *
+                1000,
+        });
         return {
             success: true,
             role: result.role,

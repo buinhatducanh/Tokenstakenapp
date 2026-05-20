@@ -1,28 +1,4 @@
-// import AdminSidebar
-// from '@/components/admin-sidebar';
 
-// export default function AdminLayout({
-//   children,
-// }: any) {
-//   return (
-//     <div
-//       style={{
-//         display: 'flex',
-//       }}
-//     >
-//       <AdminSidebar />
-
-//       <div
-//         style={{
-//           flex: 1,
-//           padding: '20px',
-//         }}
-//       >
-//         {children}
-//       </div>
-//     </div>
-//   );
-// }
 "use client";
 
 import AdminSidebar from "@/components/admin-sidebar";
