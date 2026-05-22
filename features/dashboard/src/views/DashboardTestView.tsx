@@ -3,16 +3,29 @@
 
 import { useState } from "react";
 import { DashboardView } from "../components/DashboardView";
-import { setTestScenario, type Scenario } from "../api/mock-api";
+import { setTestScenario, mockDashboardAPI, type Scenario } from "../api/mock-api";
 
 export function DashboardTestView() {
     const [currentScenario, setCurrentScenario] = useState<Scenario>("normal");
+    const [isCreating, setIsCreating] = useState(false);
 
     const handleScenarioChange = (scenario: Scenario) => {
         setCurrentScenario(scenario);
         setTestScenario(scenario);
         // Reload page to refresh data
         window.location.reload();
+    };
+
+    const handleCreateIncome = async () => {
+        setIsCreating(true);
+        await mockDashboardAPI.createPendingItem("income", Math.floor(Math.random() * 50000000) + 10000000);
+        setIsCreating(false);
+    };
+
+    const handleCreateExpense = async () => {
+        setIsCreating(true);
+        await mockDashboardAPI.createPendingItem("expense", Math.floor(Math.random() * 20000000) + 5000000);
+        setIsCreating(false);
     };
 
     return (
@@ -58,6 +71,26 @@ export function DashboardTestView() {
                         >
                             Empty
                         </button>
+                    </div>
+                    
+                    <div className="pt-2 mt-2 border-t border-gray-100">
+                        <div className="text-xs font-medium text-gray-500 mb-2">➕ Tạo Mock Data (Test Flow)</div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleCreateIncome}
+                                disabled={isCreating}
+                                className="px-3 py-1 text-xs rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 disabled:opacity-50 transition-colors"
+                            >
+                                + Hóa đơn thu
+                            </button>
+                            <button
+                                onClick={handleCreateExpense}
+                                disabled={isCreating}
+                                className="px-3 py-1 text-xs rounded-md bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 disabled:opacity-50 transition-colors"
+                            >
+                                + Giao dịch chi
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

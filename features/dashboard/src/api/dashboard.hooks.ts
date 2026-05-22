@@ -172,6 +172,20 @@ export function useDashboardStats(): DashboardData {
 
   useEffect(() => {
     fetchData();
+
+    const handleRefresh = () => {
+      fetchData();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("dashboard-refresh", handleRefresh);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("dashboard-refresh", handleRefresh);
+      }
+    };
   }, [fetchData]);
 
   // Return loading state

@@ -433,6 +433,74 @@ export const mockDashboardAPI = {
             pendingApprovals: data.pendingApprovals,
         };
     },
+
+    // Create new pending item
+    async createPendingItem(type: "income" | "expense", amount: number): Promise<void> {
+        await randomDelay(300);
+        const data = mockDataScenarios[currentScenario];
+        if (!data || currentScenario === "empty" || currentScenario === "error") return;
+
+        const isIncome = type === "income";
+        const newId = `app_mock_${Date.now()}`;
+        const newCode = isIncome ? `INV-${Math.floor(Math.random() * 10000)}` : `TXN-${Math.floor(Math.random() * 10000)}`;
+        
+        data.pendingApprovals.unshift({
+            id: newId,
+            code: newCode,
+            amount: amount,
+            submitter: "Hệ thống test",
+            type: isIncome ? "invoice" : "transaction",
+            submittedAt: new Date().toISOString(),
+            priority: "medium",
+        });
+        
+        data.stats.pendingCount += 1;
+        data.stats.pendingValue += amount;
+        
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("dashboard-refresh"));
+        }
+    },
+
+    // Approve pending item
+    async approvePendingItem(id: string): Promise<void> {
+        await randomDelay(400);
+        const data = mockDataScenarios[currentScenario];
+        if (!data) return;
+
+        const index = data.pendingApprovals.findIndex(p => p.id === id);
+        if (index === -1) return;
+
+        const pending = data.pendingApprovals[index];
+        data.pendingApprovals.splice(index, 1);
+        
+        data.stats.pendingCount = Math.max(0, data.stats.pendingCount - 1);
+        data.stats.pendingValue = Math.max(0, data.stats.pendingValue - pending.amount);
+
+        const isIncome = pending.type === 'invoice';
+        
+        if (isIncome) {
+            data.stats.revenue += pending.amount;
+        } else {
+            data.stats.expenses += pending.amount;
+        }
+        data.stats.cashflow = data.stats.revenue - data.stats.expenses;
+
+        data.transactions.unshift({
+            id: `tx_mock_${Date.now()}`,
+            description: `Đã duyệt: ${pending.code}`,
+            amount: pending.amount,
+            type: isIncome ? "INCOME" : "EXPENSE",
+            status: "APPROVED",
+            date: new Date().toISOString(),
+            counterparty: pending.submitter,
+            invoiceNumber: isIncome ? pending.code : undefined,
+        });
+
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("dashboard-refresh"));
+        }
+    },
 };
 
 // Helper to change scenario (for testing UI)

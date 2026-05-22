@@ -1,4 +1,5 @@
 import { FilePlus2, Plus, BarChart2, Clock } from "lucide-react";
+import { Link } from "react-router";
 
 const actions = [
   { label: "Tạo hóa đơn mới", href: "/invoices/new", icon: FilePlus2 },
@@ -18,14 +19,14 @@ export function QuickActions() {
         {actions.map((action) => {
           const Icon = action.icon;
           return (
-            <a
+            <Link
               key={action.label}
-              href={action.href}
+              to={action.href}
               className="flex items-center gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2.5 text-[13px] text-neutral-700 transition-colors hover:bg-neutral-50"
             >
               <Icon className="h-4 w-4 shrink-0 text-neutral-400" strokeWidth={2} />
               <span className="truncate">{action.label}</span>
-            </a>
+            </Link>
           );
         })}
       </div>
