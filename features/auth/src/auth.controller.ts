@@ -81,12 +81,16 @@ export class AuthController {
 
 
 
+    //   return {
+    //     success: true,
+    //     role: result.role,
+    //   };
+    // }
     return {
-      success: true,
+      accessToken: result.accessToken,
       role: result.role,
     };
   }
-
 
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {

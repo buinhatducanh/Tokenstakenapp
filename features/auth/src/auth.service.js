@@ -1,8 +1,4 @@
 "use strict";
-// import {
-//   Injectable,
-//   BadRequestException,
-// } from '@nestjs/common';
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -14,86 +10,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
-// import { JwtService } from '@nestjs/jwt';
-// import { randomUUID } from 'crypto';
-// import { PrismaService } from '@tokens-taken/db';
-// import { MailService } from './utils/mail.service';
-// @Injectable()
-// export class AuthService {
-//   constructor(
-//     private prisma: PrismaService,
-//     private mailService: MailService,
-//     private jwtService: JwtService,
-//   ) {}
-//   async sendMagicLink(email: string) {
-//     const token = randomUUID();
-//     let user = await this.prisma.user.findUnique({
-//       where: { email },
-//     });
-//     if (!user) {
-//       user = await this.prisma.user.create({
-//         data: { email },
-//       });
-//     }
-//     await this.prisma.user.update({
-//       where: { email },
-//       data: {
-//         magicLinkToken: token,
-//         magicLinkExpires: new Date(
-//           Date.now() + 10 * 60 * 1000,
-//         ),
-//       },
-//     });
-//     await this.mailService.sendMagicLinkEmail(
-//       email,
-//       token,
-//     );
-//     return {
-//       message: 'Magic link sent',
-//     };
-//   }
-//   async verifyMagicLink(
-//     email: string,
-//     token: string,
-//   ) {
-//     const user = await this.prisma.user.findUnique({
-//       where: { email },
-//     });
-//     if (!user) {
-//       throw new BadRequestException(
-//         'User not found',
-//       );
-//     }
-//     if (user.magicLinkToken !== token) {
-//       throw new BadRequestException(
-//         'Invalid token',
-//       );
-//     }
-//     const member =
-//       await this.prisma.organizationMember.findFirst(
-//         {
-//           where: {
-//             userId: user.id,
-//           },
-//         },
-//       );
-//     const payload = {
-//       sub: user.id,
-//       email: user.email,
-//       role: member?.role,
-//     };
-//     const accessToken =
-//       await this.jwtService.signAsync(payload);
-//     return {
-//       accessToken,
-//       user: {
-//         id: user.id,
-//         email: user.email,
-//         role: member?.role,
-//       },
-//     };
-//   }
-// }
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const crypto_1 = require("crypto");
@@ -137,9 +53,23 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.BadRequestException('User not found');
         }
-        if (user.magicLinkToken !== token) {
+        console.log('DB TOKEN =', user.magicLinkToken);
+        console.log('INPUT TOKEN =', token);
+        // ✔ check token
+        if (user.magicLinkToken?.trim() !==
+            token.trim()) {
             throw new common_1.BadRequestException('Invalid token');
         }
+        // ✔ check expired
+        // if (
+        //   !user.magicLinkExpires ||
+        //   user.magicLinkExpires <
+        //   new Date()
+        // ) {
+        //   throw new BadRequestException(
+        //     'Token expired',
+        //   );
+        // }
         const member = await this.prisma.organizationMember.findFirst({
             where: {
                 userId: user.id,

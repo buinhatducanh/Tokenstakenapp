@@ -46,8 +46,13 @@ let AuthController = class AuthController {
                 60 *
                 1000,
         });
+        //   return {
+        //     success: true,
+        //     role: result.role,
+        //   };
+        // }
         return {
-            success: true,
+            accessToken: result.accessToken,
             role: result.role,
         };
     }
