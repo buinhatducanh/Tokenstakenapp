@@ -3,6 +3,7 @@ import { DashboardLayout } from "./layout/DashboardLayout";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Invoices } from "./pages/Invoices";
+import { CreateMockData } from "./pages/CreateMockData";
 
 // Placeholder component
 const Placeholder = ({ title }: { title: string }) => (
@@ -26,8 +27,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Dashboard },
       { path: "invoices", Component: Invoices },
-      { path: "transactions", Component: () => <Placeholder title="Transactions" /> },
-      { path: "reports", Component: () => <Placeholder title="Reports" /> },
+      { path: "invoices/new", Component: CreateMockData },
+      { path: "transactions", Component: () => <Placeholder title="Giao dịch" /> },
+      { path: "transactions/new", Component: CreateMockData },
+      { path: "reports", Component: () => <Placeholder title="Báo cáo" /> },
     ],
   },
 ]);

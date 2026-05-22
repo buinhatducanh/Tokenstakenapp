@@ -60,7 +60,13 @@ export function PendingApprovals({
               </p>
             </div>
 
-            <button className="shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-[12px] font-medium text-neutral-600 transition-colors hover:bg-neutral-50">
+            <button 
+              onClick={() => {
+                import("../api/mock-api").then(({ mockDashboardAPI }) => {
+                  mockDashboardAPI.approvePendingItem(item.id);
+                });
+              }}
+              className="shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-[12px] font-medium text-neutral-600 transition-colors hover:bg-neutral-50">
               Duyệt
             </button>
           </article>
