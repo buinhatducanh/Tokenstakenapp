@@ -1,19 +1,41 @@
 // features/dashboard/src/components/PendingApprovals.tsx
 import { FileText } from "lucide-react";
-import type { Invoice } from "@packages/shared-types";
 
-function formatVND(amountStr: string): string {
-  return Number(amountStr).toLocaleString("vi-VN");
+// Tạo type linh hoạt hơn
+interface PendingItem {
+  id: string;
+  code: string;      // có thể là invoiceNumber hoặc code
+  amount: number | string;
+  submitter: string; // có thể là senderName hoặc submitter
 }
 
-const iconColors = [
-  "bg-amber-50 text-amber-500",
-  "bg-amber-50 text-amber-500",
-  "bg-rose-50 text-rose-500",
-  "bg-emerald-50 text-emerald-600",
-];
+function formatVND(amount: number | string): string {
+  const num = typeof amount === "string" ? Number(amount) : amount;
+  if (isNaN(num)) return "0";
+  return num.toLocaleString("vi-VN");
+}
 
-export function PendingApprovals({ invoices }: { invoices: Invoice[] }) {
+// Props có thể nhận nhiều dạng khác nhau
+export function PendingApprovals({
+  items
+}: {
+  items: Array<{
+    id: string;
+    invoiceNumber?: string;
+    code?: string;
+    total?: string | number;
+    amount?: string | number;
+    senderName?: string;
+    submitter?: string;
+  }>
+}) {
+  const formattedItems = items.map(item => ({
+    id: item.id,
+    code: item.invoiceNumber || item.code || "N/A",
+    amount: item.total ?? item.amount ?? 0,
+    submitter: item.senderName || item.submitter || "Unknown",
+  }));
+
   return (
     <section className="rounded-xl border border-neutral-200 bg-white shadow-sm">
       <div className="border-b border-neutral-100 px-5 py-4">
@@ -23,23 +45,18 @@ export function PendingApprovals({ invoices }: { invoices: Invoice[] }) {
       </div>
 
       <div className="divide-y divide-neutral-100">
-        {invoices.map((invoice, i) => (
-          <article
-            key={invoice.id}
-            className="flex items-center gap-3 px-5 py-3.5"
-          >
-            <div
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${iconColors[i % iconColors.length]}`}
-            >
+        {formattedItems.map((item, i) => (
+          <article key={item.id} className="flex items-center gap-3 px-5 py-3.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-500">
               <FileText className="h-4 w-4" strokeWidth={2} />
             </div>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-[14px] font-medium text-neutral-800">
-                {invoice.invoiceNumber}
+                {item.code}
               </p>
               <p className="text-[12px] text-neutral-400">
-                ₫{formatVND(invoice.total)} · {invoice.senderName}
+                ₫{formatVND(item.amount)} · {item.submitter}
               </p>
             </div>
 
@@ -49,7 +66,7 @@ export function PendingApprovals({ invoices }: { invoices: Invoice[] }) {
           </article>
         ))}
 
-        {invoices.length === 0 && (
+        {formattedItems.length === 0 && (
           <p className="py-8 text-center text-sm text-neutral-400">
             Không có hóa đơn chờ duyệt.
           </p>

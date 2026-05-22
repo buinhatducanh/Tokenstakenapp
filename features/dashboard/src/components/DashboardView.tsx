@@ -1,3 +1,4 @@
+// features/dashboard/src/components/DashboardView.tsx
 import { useDashboardStats } from "../api/dashboard.hooks";
 import { PendingApprovals } from "./PendingApprovals";
 import { QuickActions } from "./QuickActions";
@@ -25,17 +26,18 @@ export function DashboardView() {
         </span>
       </div>
 
-      {/* Row 1: Stat Cards — 4 cols */}
+      {/* Row 1: Stat Cards */}
       <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {dashboard.stats.map((stat) => (
           <StatCard key={stat.label} stat={stat} />
         ))}
       </div>
 
-      {/* Row 2: Transactions (left 1.6fr) + Pending Approvals (right 1fr) */}
+      {/* Row 2: Transactions + Pending Approvals */}
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <TransactionList transactions={dashboard.recentTransactions} />
-        <PendingApprovals invoices={dashboard.pendingInvoices} />
+        {/* Truyền đúng props - items thay vì invoices */}
+        <PendingApprovals items={dashboard.pendingInvoices} />
       </div>
 
       {/* Row 3: Quick Actions */}

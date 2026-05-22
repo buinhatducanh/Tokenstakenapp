@@ -1,8 +1,10 @@
 import { ArrowDownLeft, ArrowUpRight, Clock } from "lucide-react";
 import type { Transaction } from "@packages/shared-types";
 
-function formatVND(amountStr: string): string {
-  return Number(amountStr).toLocaleString("vi-VN");
+function formatVND(amount: string | number): string {
+  const num = typeof amount === "string" ? Number(amount) : amount;
+  if (isNaN(num)) return "0";
+  return num.toLocaleString("vi-VN");
 }
 
 function formatDate(dateStr: string): string {
@@ -62,8 +64,8 @@ export function TransactionList({
             <article
               key={tx.id}
               className={`flex items-center gap-2.5 py-2 ${i < transactions.length - 1
-                  ? "border-b border-neutral-100"
-                  : ""
+                ? "border-b border-neutral-100"
+                : ""
                 }`}
             >
               {/* Icon */}

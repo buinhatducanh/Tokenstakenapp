@@ -1,110 +1,238 @@
-import { useMemo } from "react";
-import { useAuth } from "@features/auth";
-import { useInvoices } from "@features/invoice";
-import { useTransactions } from "@features/transaction";
-import { ArrowRightLeft, Clock, TrendingDown, TrendingUp } from "lucide-react";
-import type { DashboardData } from "../dashboard.types";
-import type { Invoice, Transaction } from "@packages/shared-types";
+// features/dashboard/src/api/dashboard.hooks.ts
+import { useState, useEffect, useCallback } from "react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  ArrowRightLeft,
+  type LucideIcon
+} from "lucide-react";
+import { mockDashboardAPI, getCurrentScenario, type Scenario } from "./mock-api";
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
+// ============ Type Definitions ============
 
-function moneyToNumber(value: string): number {
-  const amount = Number.parseFloat(value);
-  return Number.isFinite(amount) ? amount : 0;
+export interface DashboardStat {
+  id: string;
+  label: string;
+  value: string;
+  detail: string;
+  tone: "emerald" | "amber" | "blue" | "rose";
+  icon: LucideIcon;
+  trend?: string;
+  trendDirection?: "up" | "down" | "neutral";
 }
 
-function formatMoney(amount: number): string {
-  return currencyFormatter.format(amount);
+// Type cho Invoice (giống với @packages/shared-types)
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  total: string;
+  senderName: string;
+  type: string;
+  status: string;
+  date: string;
 }
 
-function isReceivable(invoice: Invoice): boolean {
-  return invoice.type === "SALE" || invoice.type === "CREDIT";
+// Type cho Transaction (giống với @packages/shared-types)
+export interface Transaction {
+  id: string;
+  description: string;
+  amount: string;
+  type: "INCOME" | "EXPENSE";
+  status: "APPROVED" | "PENDING" | "FAILED";
+  date: string;
+  reference?: string;
 }
 
-function isOutflow(transaction: Transaction): boolean {
-  return transaction.type === "EXPENSE" || transaction.type === "TRANSFER";
+export interface DashboardData {
+  stats: DashboardStat[];
+  pendingInvoices: Invoice[];
+  recentTransactions: Transaction[];
+  isLoading: boolean;
+  error: Error | null;
 }
+
+// ============ Helper Functions ============
+
+const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
+
+const formatRelativeTime = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const time = date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+
+  if (diffDays === 0) return `Hôm nay, ${time}`;
+  if (diffDays === 1) return `Hôm qua, ${time}`;
+  if (diffDays < 7) return `${diffDays} ngày trước`;
+  return date.toLocaleDateString("vi-VN");
+};
+
+// ============ Converters ============
+
+const convertToStats = (mockStats: any): DashboardStat[] => {
+  return [
+    {
+      id: "revenue",
+      label: "Doanh thu",
+      value: formatCurrency(mockStats.revenue),
+      detail: "",
+      tone: "emerald",
+      icon: TrendingUp,
+      trend: `↑ ${mockStats.trends.revenue}% so với tháng trước`,
+      trendDirection: "up",
+    },
+    {
+      id: "expenses",
+      label: "Chi phí",
+      value: formatCurrency(mockStats.expenses),
+      detail: "",
+      tone: "rose",
+      icon: TrendingDown,
+      trend: `↑ ${mockStats.trends.expenses}% so với tháng trước`,
+      trendDirection: "up",
+    },
+    {
+      id: "pending",
+      label: "Chờ duyệt",
+      value: mockStats.pendingCount.toString(),
+      detail: "hóa đơn đang chờ",
+      tone: "amber",
+      icon: Clock,
+    },
+    {
+      id: "cashflow",
+      label: "Dòng tiền",
+      value: formatCurrency(mockStats.cashflow),
+      detail: "",
+      tone: "blue",
+      icon: ArrowRightLeft,
+      trend: `↑ ${mockStats.trends.cashflow}% so với tháng trước`,
+      trendDirection: mockStats.cashflow >= 0 ? "up" : "down",
+    },
+  ];
+};
+
+// Chuyển đổi mock approval thành Invoice (đúng format PendingApprovals cần)
+const convertToInvoices = (mockApprovals: any[]): Invoice[] => {
+  return mockApprovals.map((app) => ({
+    id: app.id,
+    invoiceNumber: app.code,
+    total: app.amount.toString(),
+    senderName: app.submitter,
+    type: app.type === "invoice" ? "SALE" : "EXPENSE",
+    status: "PENDING_APPROVAL",
+    date: app.submittedAt || new Date().toISOString(),
+  }));
+};
+
+// Chuyển đổi mock transaction thành Transaction (đúng format TransactionList cần)
+const convertToTransactions = (mockTransactions: any[]): Transaction[] => {
+  return mockTransactions.map((tx) => ({
+    id: tx.id,
+    description: tx.description,
+    amount: tx.amount.toString(),
+    type: tx.type === "INCOME" ? "INCOME" : "EXPENSE",
+    status: tx.status === "PENDING" ? "PENDING" : "APPROVED",
+    date: tx.date,
+    reference: tx.invoiceNumber || tx.reference,
+  }));
+};
+
+// ============ Main Hook ============
 
 export function useDashboardStats(): DashboardData {
-  const { organization } = useAuth();
-  const invoices = useInvoices(organization.id);
-  const transactions = useTransactions(organization.id);
+  const [data, setData] = useState<{
+    stats: any;
+    transactions: any[];
+    pendingApprovals: any[];
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  return useMemo(() => {
-    const invoiceData = invoices.data;
-    const transactionData = transactions.data;
-    const pendingInvoices = invoiceData.filter((invoice) => invoice.status === "PENDING_APPROVAL");
-    const receivables = invoiceData
-      .filter(isReceivable)
-      .reduce((sum, invoice) => sum + moneyToNumber(invoice.total), 0);
-    const pendingValue = pendingInvoices.reduce((sum, invoice) => sum + moneyToNumber(invoice.total), 0);
-    const cashIn = transactionData
-      .filter((transaction) => transaction.type === "INCOME" && transaction.status === "APPROVED")
-      .reduce((sum, transaction) => sum + moneyToNumber(transaction.amount), 0);
-    const cashOut = transactionData
-      .filter((transaction) => isOutflow(transaction) && transaction.status === "APPROVED")
-      .reduce((sum, transaction) => sum + moneyToNumber(transaction.amount), 0);
-    const pendingTransactions = transactionData.filter((transaction) => transaction.status === "PENDING").length;
-    const recentTransactions = [...transactionData]
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 5);
+  const fetchData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const dashboardData = await mockDashboardAPI.getDashboardData(getCurrentScenario());
+      setData(dashboardData);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch dashboard data:", err);
+      setError(err as Error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Return loading state
+  if (isLoading) {
     return {
-      organizationName: organization.name,
-      stats: [
-        {
-          label: "Doanh thu",
-          value: "₫128,4M",
-          detail: "",
-          tone: "emerald",
-          icon: TrendingUp,
-          trend: "+12,3% so với tháng trước",
-          trendDirection: "up",
-        },
-        {
-          label: "Chi phí",
-          value: "₫74,1M",
-          detail: "",
-          tone: "rose",
-          icon: TrendingDown,
-          trend: "+5,7% so với tháng trước",
-          trendDirection: "up",
-        },
-        {
-          label: "Chờ duyệt",
-          value: "7",
-          detail: "hóa đơn đang chờ",
-          tone: "amber",
-          icon: Clock,
-        },
-        {
-          label: "Dòng tiền",
-          value: "₫54,3M",
-          detail: "",
-          tone: "blue",
-          icon: ArrowRightLeft,
-          trend: "+8,1% so với tháng trước",
-          trendDirection: "up",
-        },
-      ],
-      invoices: invoiceData,
-      transactions: transactionData,
-      pendingInvoices,
-      recentTransactions,
-      isLoading: invoices.isLoading || transactions.isLoading,
-      error: invoices.error ?? transactions.error,
+      stats: [],
+      pendingInvoices: [],
+      recentTransactions: [],
+      isLoading: true,
+      error: null,
     };
-  }, [invoices.data, invoices.error, invoices.isLoading, organization.name, transactions.data, transactions.error, transactions.isLoading]);
+  }
+
+  // Return error state
+  if (error || !data) {
+    return {
+      stats: [],
+      pendingInvoices: [],
+      recentTransactions: [],
+      isLoading: false,
+      error: error || new Error("No data available"),
+    };
+  }
+
+  // Return success state với dữ liệu đã được convert đúng format
+  return {
+    stats: convertToStats(data.stats),
+    pendingInvoices: convertToInvoices(data.pendingApprovals),
+    recentTransactions: convertToTransactions(data.transactions),
+    isLoading: false,
+    error: null,
+  };
 }
 
-export function useRecentTransactions() {
-  return useDashboardStats().recentTransactions;
+// ============ Additional Hooks ============
+
+export function useRecentTransactions(): {
+  data: Transaction[];
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const { recentTransactions, isLoading, error } = useDashboardStats();
+  return { data: recentTransactions, isLoading, error };
 }
 
-export function usePendingApprovals() {
-  return useDashboardStats().pendingInvoices;
+export function usePendingApprovals(): {
+  data: Invoice[];
+  isLoading: boolean;
+  error: Error | null;
+} {
+  const { pendingInvoices, isLoading, error } = useDashboardStats();
+  return { data: pendingInvoices, isLoading, error };
 }
+
+// Helper to refresh data (for testing)
+export function useRefreshDashboard() {
+  const [key, setKey] = useState(0);
+  const refresh = useCallback(() => setKey((prev) => prev + 1), []);
+  return { refresh, key };
+}
+
+// Export scenario changer for testing
+export { setTestScenario, getCurrentScenario } from "./mock-api";
+export type { Scenario } from "./mock-api";

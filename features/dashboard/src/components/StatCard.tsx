@@ -1,3 +1,4 @@
+// features/dashboard/src/components/StatCard.tsx
 import { ArrowUp, ArrowDown } from "lucide-react";
 import type { DashboardStat } from "../dashboard.types";
 
@@ -9,6 +10,7 @@ const iconColor: Record<string, string> = {
 };
 
 export function StatCard({ stat }: { stat: DashboardStat }) {
+  // Kiểm tra nếu icon là null hoặc undefined thì không render
   const Icon = stat.icon;
   const isUp = stat.trendDirection === "up";
   const TrendIcon = isUp ? ArrowUp : ArrowDown;
@@ -19,10 +21,13 @@ export function StatCard({ stat }: { stat: DashboardStat }) {
     <section className="flex flex-col rounded-lg bg-neutral-100 p-4">
       {/* Label row */}
       <div className="flex items-center gap-1.5">
-        <Icon
-          className={`h-[15px] w-[15px] ${iconColor[stat.tone]}`}
-          strokeWidth={2.5}
-        />
+        {/* Chỉ render Icon nếu nó tồn tại và là function/component */}
+        {Icon && typeof Icon === 'function' && (
+          <Icon
+            className={`h-[15px] w-[15px] ${iconColor[stat.tone]}`}
+            strokeWidth={2.5}
+          />
+        )}
         <p className="text-[12px] text-neutral-500">{stat.label}</p>
       </div>
 
