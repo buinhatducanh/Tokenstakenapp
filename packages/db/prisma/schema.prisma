@@ -36,6 +36,9 @@ model User {
   lastLoginAt             DateTime?
   magicLinkToken          String?               @unique
   magicLinkExpires        DateTime?
+
+  failedAttempts          Int                   @default(0)
+
   auditLogs               AuditLog[]
   invoiceAssignments      InvoiceAssignment[]
   organizationMemberships OrganizationMember[]

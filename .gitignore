@@ -3,8 +3,6 @@ node_modules/
 .pnpm-store/
 
 # Environment variables — NEVER commit real credentials
-.env
-.env.local
 .env.*.local
 
 # Build outputs
@@ -17,7 +15,6 @@ out/
 packages/db/prisma/migrations/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -36,3 +33,4 @@ coverage/
 
 # Misc
 *.tsbuildinfo
+config.bat

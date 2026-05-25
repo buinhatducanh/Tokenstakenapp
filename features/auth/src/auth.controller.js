@@ -30,11 +30,13 @@ let AuthController = class AuthController {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
-            maxAge: 7 *
-                24 *
-                60 *
-                60 *
-                1000,
+            // maxAge:
+            //   7 *
+            //   24 *
+            //   60 *
+            //   60 *
+            //   1000,
+            maxAge: 24 * 60 * 60 * 1000,
         });
         res.cookie('role', result.role, {
             httpOnly: false,
