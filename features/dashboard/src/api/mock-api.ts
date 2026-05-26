@@ -340,6 +340,72 @@ const mockDataScenarios = {
 };
 
 export type Scenario = "normal" | "highRevenue" | "manyPending" | "empty" | "error";
+export type Timeframe = "day" | "week" | "month" | "year";
+
+// Helper to scale stats based on timeframe (giả sử dữ liệu gốc là theo tháng)
+function scaleStatsForTimeframe(stats: MockStatsResponse, timeframe: Timeframe): MockStatsResponse {
+    const scaleFactor = timeframe === "day" ? 1/30 : timeframe === "week" ? 1/4 : timeframe === "year" ? 12 : 1;
+    return {
+        ...stats,
+        revenue: Math.round(stats.revenue * scaleFactor),
+        expenses: Math.round(stats.expenses * scaleFactor),
+        cashflow: Math.round(stats.cashflow * scaleFactor),
+        // pendingCount và pendingValue là trạng thái hiện tại nên không scale theo thời gian
+    };
+}
+
+export interface ChartDataPoint {
+    period: string;
+    revenue: number;
+    expenses: number;
+    cashflow: number;
+    pendingCount: number;
+    approvedCount: number;
+}
+
+function generateChartData(timeframe: Timeframe, stats: MockStatsResponse): ChartDataPoint[] {
+    const data: ChartDataPoint[] = [];
+    const baseRevenue = stats.revenue || 0;
+    const baseExpenses = stats.expenses || 0;
+    const basePending = stats.pendingCount || 0;
+    
+    let periods: string[] = [];
+    let divider = 1;
+    
+    if (timeframe === "year") {
+        periods = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"];
+        divider = 1; 
+    } else if (timeframe === "month") {
+        periods = ["Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"];
+        divider = 4;
+    } else if (timeframe === "week") {
+        periods = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+        divider = 30; 
+    } else if (timeframe === "day") {
+        periods = ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"];
+        divider = 30 * 6;
+    }
+    
+    for (const period of periods) {
+        // Random variance between 0.7 and 1.3
+        const varianceR = 0.7 + Math.random() * 0.6;
+        const varianceE = 0.7 + Math.random() * 0.6;
+        
+        const rev = Math.round((baseRevenue / divider) * varianceR);
+        const exp = Math.round((baseExpenses / divider) * varianceE);
+        
+        data.push({
+            period,
+            revenue: rev,
+            expenses: exp,
+            cashflow: rev - exp,
+            pendingCount: Math.max(0, Math.round((basePending / (periods.length / 2)) * varianceE) + Math.floor(Math.random() * 3 - 1)),
+            approvedCount: Math.max(0, Math.round(10 * varianceR)),
+        });
+    }
+    
+    return data;
+}
 
 // Simulate API delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -353,7 +419,7 @@ const randomDelay = (baseMs: number) => {
 // Mock API functions
 export const mockDashboardAPI = {
     // Get dashboard stats
-    async getStats(scenario: Scenario = "normal"): Promise<MockStatsResponse> {
+    async getStats(scenario: Scenario = "normal", timeframe: Timeframe = "month"): Promise<MockStatsResponse> {
         await randomDelay(400);
 
         // Simulate error for error scenario
@@ -366,9 +432,7 @@ export const mockDashboardAPI = {
             throw new Error(`Scenario "${scenario}" not found`);
         }
 
-        return {
-            ...data.stats,
-        };
+        return scaleStatsForTimeframe(data.stats, timeframe);
     },
 
     // Get recent transactions
@@ -410,10 +474,11 @@ export const mockDashboardAPI = {
     },
 
     // Get full dashboard data
-    async getDashboardData(scenario: Scenario = "normal"): Promise<{
+    async getDashboardData(scenario: Scenario = "normal", timeframe: Timeframe = "month"): Promise<{
         stats: MockStatsResponse;
         transactions: MockTransaction[];
         pendingApprovals: MockPendingApproval[];
+        chartData: ChartDataPoint[];
     }> {
         await randomDelay(500);
 
@@ -428,9 +493,10 @@ export const mockDashboardAPI = {
         }
 
         return {
-            stats: data.stats,
+            stats: scaleStatsForTimeframe(data.stats, timeframe),
             transactions: data.transactions,
             pendingApprovals: data.pendingApprovals,
+            chartData: generateChartData(timeframe, data.stats),
         };
     },
 
