@@ -15,6 +15,32 @@ function formatVND(amount: number | string): string {
   return num.toLocaleString("vi-VN");
 }
 
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  
+  const diffDays = Math.floor(
+    (startOfToday.getTime() - startOfDate.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  
+  const time = date.toLocaleTimeString("vi-VN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  if (diffDays === 0) return `Hôm nay, ${time}`;
+  if (diffDays === 1) return `Hôm qua, ${time}`;
+  
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${time}, ${day}/${month}/${year}`;
+}
+
 // Props có thể nhận nhiều dạng khác nhau
 export function PendingApprovals({
   items
@@ -27,6 +53,7 @@ export function PendingApprovals({
     amount?: string | number;
     senderName?: string;
     submitter?: string;
+    date?: string;
   }>
 }) {
   const formattedItems = items.map(item => ({
@@ -34,6 +61,7 @@ export function PendingApprovals({
     code: item.invoiceNumber || item.code || "N/A",
     amount: item.total ?? item.amount ?? 0,
     submitter: item.senderName || item.submitter || "Unknown",
+    date: item.date || new Date().toISOString(),
   }));
 
   return (
@@ -55,8 +83,11 @@ export function PendingApprovals({
               <p className="truncate text-[14px] font-medium text-neutral-800">
                 {item.code}
               </p>
-              <p className="text-[12px] text-neutral-400">
+              <p className="text-[12px] text-neutral-400 mt-0.5">
                 ₫{formatVND(item.amount)} · {item.submitter}
+              </p>
+              <p className="text-[11px] text-neutral-400 mt-0.5">
+                {formatDate(item.date)}
               </p>
             </div>
 

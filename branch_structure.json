@@ -1,0 +1,33 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "Hau-Dashboard",
+    "feature/auth/han",
+    "feature/invoice/trungtin",
+    "features/invoice/nghi",
+    "features/reports/anhngu",
+    "features/reports/nhan",
+    "features/transaction/anhngu",
+    "main"
+  ],
+  "parent": {
+    "Hau-Dashboard": "main",
+    "feature/auth/han": "main",
+    "feature/invoice/trungtin": "main",
+    "features/invoice/nghi": "main",
+    "features/reports/anhngu": "main",
+    "features/reports/nhan": "main",
+    "features/transaction/anhngu": "main",
+    "main": null
+  },
+  "order": [
+    "main",
+    "Hau-Dashboard",
+    "feature/auth/han",
+    "feature/invoice/trungtin",
+    "features/invoice/nghi",
+    "features/reports/anhngu",
+    "features/reports/nhan",
+    "features/transaction/anhngu"
+  ]
+}
