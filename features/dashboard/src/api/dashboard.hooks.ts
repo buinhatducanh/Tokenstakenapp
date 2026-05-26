@@ -7,7 +7,7 @@ import {
   ArrowRightLeft,
   type LucideIcon
 } from "lucide-react";
-import { mockDashboardAPI, getCurrentScenario, type Scenario } from "./mock-api";
+import { mockDashboardAPI, getCurrentScenario, type Scenario, type Timeframe, type ChartDataPoint } from "./mock-api";
 
 // ============ Type Definitions ============
 
@@ -48,6 +48,7 @@ export interface DashboardData {
   stats: DashboardStat[];
   pendingInvoices: Invoice[];
   recentTransactions: Transaction[];
+  chartData: ChartDataPoint[];
   isLoading: boolean;
   error: Error | null;
 }
@@ -76,7 +77,18 @@ const formatRelativeTime = (dateStr: string): string => {
 
 // ============ Converters ============
 
-const convertToStats = (mockStats: any): DashboardStat[] => {
+const getTrendText = (timeframe: string) => {
+  switch (timeframe) {
+    case "day": return "so với hôm qua";
+    case "week": return "so với tuần trước";
+    case "year": return "so với năm trước";
+    case "month":
+    default: return "so với tháng trước";
+  }
+};
+
+const convertToStats = (mockStats: any, timeframe: string): DashboardStat[] => {
+  const trendText = getTrendText(timeframe);
   return [
     {
       id: "revenue",
@@ -85,7 +97,7 @@ const convertToStats = (mockStats: any): DashboardStat[] => {
       detail: "",
       tone: "emerald",
       icon: TrendingUp,
-      trend: `↑ ${mockStats.trends.revenue}% so với tháng trước`,
+      trend: `↑ ${mockStats.trends.revenue}% ${trendText}`,
       trendDirection: "up",
     },
     {
@@ -95,7 +107,7 @@ const convertToStats = (mockStats: any): DashboardStat[] => {
       detail: "",
       tone: "rose",
       icon: TrendingDown,
-      trend: `↑ ${mockStats.trends.expenses}% so với tháng trước`,
+      trend: `↑ ${mockStats.trends.expenses}% ${trendText}`,
       trendDirection: "up",
     },
     {
@@ -113,7 +125,7 @@ const convertToStats = (mockStats: any): DashboardStat[] => {
       detail: "",
       tone: "blue",
       icon: ArrowRightLeft,
-      trend: `↑ ${mockStats.trends.cashflow}% so với tháng trước`,
+      trend: `↑ ${mockStats.trends.cashflow}% ${trendText}`,
       trendDirection: mockStats.cashflow >= 0 ? "up" : "down",
     },
   ];
@@ -147,11 +159,12 @@ const convertToTransactions = (mockTransactions: any[]): Transaction[] => {
 
 // ============ Main Hook ============
 
-export function useDashboardStats(): DashboardData {
+export function useDashboardStats(timeframe: Timeframe = "month"): DashboardData {
   const [data, setData] = useState<{
     stats: any;
     transactions: any[];
     pendingApprovals: any[];
+    chartData: any[];
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -159,7 +172,7 @@ export function useDashboardStats(): DashboardData {
   const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const dashboardData = await mockDashboardAPI.getDashboardData(getCurrentScenario());
+      const dashboardData = await mockDashboardAPI.getDashboardData(getCurrentScenario(), timeframe);
       setData(dashboardData);
       setError(null);
     } catch (err) {
@@ -168,7 +181,7 @@ export function useDashboardStats(): DashboardData {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [timeframe]);
 
   useEffect(() => {
     fetchData();
@@ -194,6 +207,7 @@ export function useDashboardStats(): DashboardData {
       stats: [],
       pendingInvoices: [],
       recentTransactions: [],
+      chartData: [],
       isLoading: true,
       error: null,
     };
@@ -205,6 +219,7 @@ export function useDashboardStats(): DashboardData {
       stats: [],
       pendingInvoices: [],
       recentTransactions: [],
+      chartData: [],
       isLoading: false,
       error: error || new Error("No data available"),
     };
@@ -212,9 +227,10 @@ export function useDashboardStats(): DashboardData {
 
   // Return success state với dữ liệu đã được convert đúng format
   return {
-    stats: convertToStats(data.stats),
+    stats: convertToStats(data.stats, timeframe),
     pendingInvoices: convertToInvoices(data.pendingApprovals),
     recentTransactions: convertToTransactions(data.transactions),
+    chartData: data.chartData,
     isLoading: false,
     error: null,
   };

@@ -10,16 +10,28 @@ function formatVND(amount: string | number): string {
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
+  
+  // Normalize to start of day for accurate day diff
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  
   const diffDays = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+    (startOfToday.getTime() - startOfDate.getTime()) / (1000 * 60 * 60 * 24),
   );
+  
   const time = date.toLocaleTimeString("vi-VN", {
     hour: "2-digit",
     minute: "2-digit",
   });
+
   if (diffDays === 0) return `Hôm nay, ${time}`;
   if (diffDays === 1) return `Hôm qua, ${time}`;
-  return `${diffDays} ngày trước`;
+  
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${time}, ${day}/${month}/${year}`;
 }
 
 export function TransactionList({
