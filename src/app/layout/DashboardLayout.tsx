@@ -12,11 +12,11 @@ import {
   LogOut,
   Hexagon
 } from "lucide-react";
-import { CommandPalette } from "../components/CommandPalette";
+import { useCommandPalette } from "@features/command-palette";
 
 export function DashboardLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [cmdOpen, setCmdOpen] = useState(false);
+  const { open: openCommandPalette } = useCommandPalette();
   const navigate = useNavigate();
 
   const navItems = [
@@ -99,7 +99,7 @@ export function DashboardLayout() {
         <header className="flex h-14 items-center justify-between border-b border-neutral-200 bg-white px-6 shrink-0">
           <div className="flex items-center flex-1">
             <button
-              onClick={() => setCmdOpen(true)}
+              onClick={openCommandPalette}
               className="flex w-64 items-center gap-2 rounded-md border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-sm text-neutral-500 hover:bg-neutral-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             >
               <Search className="h-4 w-4" />
@@ -126,8 +126,6 @@ export function DashboardLayout() {
           <Outlet />
         </div>
       </main>
-
-      <CommandPalette open={cmdOpen} setOpen={setCmdOpen} />
     </div>
   );
 }

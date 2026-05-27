@@ -25,3 +25,8 @@ export type {
   AccountType,
 } from "./transaction/transaction.types";
 export type { ApiResponse, PaginatedResponse } from "./api/api.types";
+export type {
+  CommandItem,
+  CommandGroup,
+  CommandRegistry,
+} from "./command-palette/command-palette.types";

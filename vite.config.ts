@@ -29,11 +29,15 @@ export default defineConfig({
     alias: {
       // Alias @ to the src directory
       '@': path.resolve(__dirname, './src'),
+      // Feature and package aliases
       '@features/auth': path.resolve(__dirname, './features/auth/src/index.ts'),
       '@features/invoice': path.resolve(__dirname, './features/invoice/src/index.ts'),
       '@features/transaction': path.resolve(__dirname, './features/transaction/src/index.ts'),
       '@features/dashboard': path.resolve(__dirname, './features/dashboard/src/index.ts'),
+      '@features/command-palette': path.resolve(__dirname, './features/command-palette/src/index.ts'),
+      '@features/reports': path.resolve(__dirname, './features/reports/src/index.ts'),
       '@packages/shared-types': path.resolve(__dirname, './packages/shared-types/src/index.ts'),
+      '@packages/common-utils': path.resolve(__dirname, './packages/common-utils/src/index.ts'),
     },
   },
 
