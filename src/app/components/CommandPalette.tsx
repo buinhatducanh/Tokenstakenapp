@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Command } from "cmdk";
 import { useNavigate } from "react-router";
 import { 
@@ -12,7 +12,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export function CommandPalette({ open, setOpen }: { open: boolean, setOpen: (open: boolean) => void }) {
+export function CommandPalette({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const navigate = useNavigate();
 
   useEffect(() => {
