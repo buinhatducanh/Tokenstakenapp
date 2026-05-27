@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "paths": {
+      "@tokens-taken/shared-types": ["../../packages/shared-types/src/index.ts"],
+      "@tokens-taken/common-utils": ["../../packages/common-utils/src/index.ts"],
+      "@tokens-taken/db": ["../../packages/db/src/index.ts"],
+      "@tokens-taken/feature-transaction": ["../../features/transaction/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"]
+}
