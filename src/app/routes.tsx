@@ -4,8 +4,10 @@ import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Invoices } from "./pages/Invoices";
 
+import { Transactions } from "./pages/Transactions";
+
 // Placeholder component
-const Placeholder = ({ title }: { title: string }) => (
+export const Placeholder = ({ title }: { title: string }) => (
   <div className="flex flex-col items-center justify-center h-[60vh] text-neutral-500">
     <div className="h-16 w-16 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
       <span className="text-2xl">🚧</span>
@@ -26,7 +28,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Dashboard },
       { path: "invoices", Component: Invoices },
-      { path: "transactions", Component: () => <Placeholder title="Transactions" /> },
+      { path: "transactions", Component: Transactions },
       { path: "reports", Component: () => <Placeholder title="Reports" /> },
     ],
   },

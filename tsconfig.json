@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "exactOptionalPropertyTypes": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@tokens-taken/shared-types": ["./packages/shared-types/src/index.ts"],
+      "@tokens-taken/common-utils": ["./packages/common-utils/src/index.ts"],
+      "@packages/shared-types": ["./packages/shared-types/src/index.ts"],
+      "@packages/common-utils": ["./packages/common-utils/src/index.ts"],
+      "@features/transaction": ["./features/transaction/src/index.ts"],
+      "@features/auth": ["./features/auth/src/index.ts"],
+      "@features/invoice": ["./features/invoice/src/index.ts"],
+      "@features/dashboard": ["./features/dashboard/src/index.ts"],
+      "@features/command-palette": ["./features/command-palette/src/index.ts"],
+      "@features/reports": ["./features/reports/src/index.ts"]
+    }
+  },
+  "include": ["src", "features", "packages", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}
