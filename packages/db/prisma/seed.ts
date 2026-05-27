@@ -72,8 +72,15 @@ async function main() {
   console.log(`✅ ${defaultAccounts.length} default accounts created`);
 
   // 5. Tạo sample invoice
-  const invoice = await prisma.invoice.create({
-    data: {
+  const invoice = await prisma.invoice.upsert({
+    where: {
+      organizationId_invoiceNumber: {
+        organizationId: org.id,
+        invoiceNumber: "INV-2026-000001",
+      },
+    },
+    update: {},
+    create: {
       organizationId: org.id,
       invoiceNumber: "INV-2026-000001",
       type: InvoiceType.SALE,

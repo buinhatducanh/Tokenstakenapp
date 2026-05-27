@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "ts-node src/main.ts",
-    "dev": "ts-node src/main.ts",
-    "build": "nest build",
+    "start": "node init && ts-node src/main.ts",
+    "dev": "node init && ts-node src/main.ts",
+    "build": "node init && nest build",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "jest",

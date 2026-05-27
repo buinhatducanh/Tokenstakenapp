@@ -3,6 +3,7 @@ import { DashboardLayout } from "./layout/DashboardLayout";
 import { Login } from "./pages/Login";
 import { Dashboard } from "./pages/Dashboard";
 import { Invoices } from "./pages/Invoices";
+import { CreateMockData } from "./pages/CreateMockData";
 
 import { Transactions } from "./pages/Transactions";
 
@@ -28,7 +29,9 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: Dashboard },
       { path: "invoices", Component: Invoices },
+      { path: "invoices/new", Component: CreateMockData },
       { path: "transactions", Component: Transactions },
+      { path: "transactions/new", Component: CreateMockData },
       { path: "reports", Component: () => <Placeholder title="Reports" /> },
     ],
   },
