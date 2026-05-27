@@ -36,7 +36,14 @@ export default defineConfig({
       '@packages/shared-types': path.resolve(__dirname, './packages/shared-types/src/index.ts'),
     },
   },
-
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true,
+      }
+    }
+  },
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
 })

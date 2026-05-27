@@ -4,6 +4,7 @@ export type PaginationOptions = {
   page: number;
   pageSize: number;
   total: number;
+  totalPages: number;
 };
 
 export function paginate<T>(

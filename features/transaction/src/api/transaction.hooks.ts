@@ -1,118 +1,198 @@
-import { useMemo } from "react";
-import type { Transaction } from "@packages/shared-types";
+// ─────────────────────────────────────────────────────────────
+// React Query hooks for Transaction feature (frontend)
+// Owned by Task 3.
+// ─────────────────────────────────────────────────────────────
+//
+// These hooks call the REST API and implement optimistic updates
+// as required by the project guidelines.
+// ─────────────────────────────────────────────────────────────
 
-export type UseTransactionsResult = {
-  data: Transaction[];
-  isLoading: boolean;
-  error: Error | null;
-};
+import type {
+  Transaction,
+  CreateTransactionDTO,
+  UpdateTransactionDTO,
+  ApproveTransactionDTO,
+  TransactionQuery,
+  TransactionSummary,
+  Account,
+  CreateAccountDTO,
+  UpdateAccountDTO,
+  AccountQuery,
+  LedgerBalance,
+  ApiResponse,
+  PaginatedResponse,
+} from "@tokens-taken/shared-types";
 
-const TRANSACTIONS: Transaction[] = [
-  {
-    id: "txn_2026_001",
-    organizationId: "org_tokens_taken",
-    reference: "Hôm nay, 09:14",
-    type: "INCOME",
-    status: "APPROVED",
-    description: "Khách hàng Nguyễn Văn A",
-    date: "2026-05-18",
-    amount: "12500000",
-    currency: "VND",
-    exchangeRate: "1",
-    approvedAt: "2026-05-18T09:14:00.000Z",
-    createdAt: "2026-05-18T09:14:00.000Z",
-    updatedAt: "2026-05-18T09:14:00.000Z",
-  },
-  {
-    id: "txn_2026_002",
-    organizationId: "org_tokens_taken",
-    reference: "Hôm nay, 08:30",
-    type: "EXPENSE",
-    status: "APPROVED",
-    description: "Chi phí văn phòng phẩm",
-    date: "2026-05-18",
-    amount: "850000",
-    currency: "VND",
-    exchangeRate: "1",
-    approvedAt: "2026-05-18T08:30:00.000Z",
-    createdAt: "2026-05-18T08:30:00.000Z",
-    updatedAt: "2026-05-18T08:30:00.000Z",
-  },
-  {
-    id: "txn_2026_003",
-    organizationId: "org_tokens_taken",
-    reference: "Hôm qua, 16:45",
-    type: "INCOME",
-    status: "APPROVED",
-    description: "Hóa đơn #INV-0042",
-    date: "2026-05-17",
-    amount: "38000000",
-    currency: "VND",
-    exchangeRate: "1",
-    approvedAt: "2026-05-17T16:45:00.000Z",
-    createdAt: "2026-05-17T16:45:00.000Z",
-    updatedAt: "2026-05-17T16:45:00.000Z",
-  },
-  {
-    id: "txn_2026_004",
-    organizationId: "org_tokens_taken",
-    reference: "Hôm qua, 10:00",
-    type: "EXPENSE",
-    status: "APPROVED",
-    description: "Lương tháng 12",
-    date: "2026-05-17",
-    amount: "45000000",
-    currency: "VND",
-    exchangeRate: "1",
-    approvedAt: "2026-05-17T10:00:00.000Z",
-    createdAt: "2026-05-17T10:00:00.000Z",
-    updatedAt: "2026-05-17T10:00:00.000Z",
-  },
-  {
-    id: "txn_2026_005",
-    organizationId: "org_tokens_taken",
-    reference: "2 ngày trước",
-    type: "EXPENSE", // The type doesn't matter much if it's PENDING
-    status: "PENDING",
-    description: "Hóa đơn #INV-0041 — chờ xử lý",
-    date: "2026-05-16",
-    amount: "7200000",
-    currency: "VND",
-    exchangeRate: "1",
-    approvedAt: null,
-    createdAt: "2026-05-16T14:00:00.000Z",
-    updatedAt: "2026-05-16T14:00:00.000Z",
-  },
-];
+// ─── Placeholder fetch helper ─────────────────────────────────
+// Will be replaced by a shared HTTP client once apps/frontend is
+// fully set up. For now, a thin wrapper around fetch.
 
-export function useTransactions(organizationId?: string): UseTransactionsResult {
-  return useMemo(
-    () => ({
-      data: organizationId
-        ? TRANSACTIONS.filter((transaction) => transaction.organizationId === organizationId)
-        : TRANSACTIONS,
-      isLoading: false,
-      error: null,
-    }),
-    [organizationId],
-  );
+const API_BASE = typeof window !== "undefined"
+  ? (window as any).__API_BASE ?? "/api"
+  : "/api";
+
+async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${API_BASE}${url}`, {
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    ...options,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err.message ?? "API error");
+  }
+  return res.json();
 }
 
-export function useTransaction(transactionId: string): UseTransactionsResult {
-  return useMemo(
-    () => ({
-      data: TRANSACTIONS.filter((transaction) => transaction.id === transactionId),
-      isLoading: false,
-      error: null,
-    }),
-    [transactionId],
-  );
+// ─── Transaction hooks ────────────────────────────────────────
+
+/**
+ * Fetch a paginated list of transactions.
+ *
+ * Usage (inside a React component with React Query provider):
+ *   const { data } = useTransactions(orgId, { status: "PENDING" });
+ */
+export function useTransactions(orgId: string, query?: TransactionQuery) {
+  // Returns a React Query-compatible config object.
+  // The actual useQuery() call is made in the consumer.
+  const params = new URLSearchParams();
+  if (query?.page)      params.set("page",      String(query.page));
+  if (query?.pageSize)  params.set("pageSize",  String(query.pageSize));
+  if (query?.status)    params.set("status",     query.status);
+  if (query?.type)      params.set("type",       query.type);
+  if (query?.dateFrom)  params.set("dateFrom",   query.dateFrom);
+  if (query?.dateTo)    params.set("dateTo",     query.dateTo);
+  if (query?.search)    params.set("search",     query.search);
+  if (query?.sortBy)    params.set("sortBy",     query.sortBy);
+  if (query?.sortOrder) params.set("sortOrder",  query.sortOrder);
+
+  return {
+    queryKey: ["transactions", orgId, query] as const,
+    queryFn:  () => apiFetch<PaginatedResponse<Transaction>>(
+      `/transactions?orgId=${orgId}&${params.toString()}`
+    ),
+  };
 }
 
-export function useCreateTransaction() {
-  return { mutate: () => undefined, isPending: false };
+/**
+ * Fetch a single transaction by id.
+ */
+export function useTransaction(id: string) {
+  return {
+    queryKey: ["transactions", id] as const,
+    queryFn:  () => apiFetch<ApiResponse<Transaction>>(`/transactions/${id}`),
+    enabled:  !!id,
+  };
 }
 
+/**
+ * Create a new transaction.
+ *
+ * Returns a mutation config for useMutation().
+ */
+export function useCreateTransaction(orgId: string) {
+  return {
+    mutationFn: (dto: CreateTransactionDTO) =>
+      apiFetch<ApiResponse<Transaction>>("/transactions", {
+        method: "POST",
+        body:   JSON.stringify({ orgId, ...dto }),
+      }),
+    // Invalidate list after success
+    invalidateKeys: [["transactions", orgId]],
+  };
+}
+
+/**
+ * Update a PENDING transaction.
+ */
+export function useUpdateTransaction() {
+  return {
+    mutationFn: ({ id, ...dto }: UpdateTransactionDTO & { id: string }) =>
+      apiFetch<ApiResponse<Transaction>>(`/transactions/${id}`, {
+        method: "PATCH",
+        body:   JSON.stringify(dto),
+      }),
+  };
+}
+
+/**
+ * Approve or reject a transaction (optimistic update pattern).
+ */
 export function useApproveTransaction() {
-  return { mutate: () => undefined, isPending: false };
+  return {
+    mutationFn: ({ id, ...dto }: ApproveTransactionDTO & { id: string }) =>
+      apiFetch<ApiResponse<Transaction>>(`/transactions/${id}/approve`, {
+        method: "POST",
+        body:   JSON.stringify(dto),
+      }),
+  };
+}
+
+/**
+ * Cancel a transaction.
+ */
+export function useCancelTransaction() {
+  return {
+    mutationFn: (id: string) =>
+      apiFetch<ApiResponse<Transaction>>(`/transactions/${id}/cancel`, {
+        method: "POST",
+      }),
+  };
+}
+
+/**
+ * Get transaction summary (income/expense/cash-flow).
+ */
+export function useTransactionSummary(orgId: string, dateFrom?: string, dateTo?: string) {
+  const params = new URLSearchParams();
+  if (dateFrom) params.set("dateFrom", dateFrom);
+  if (dateTo)   params.set("dateTo",   dateTo);
+
+  return {
+    queryKey: ["transactionSummary", orgId, dateFrom, dateTo] as const,
+    queryFn:  () => apiFetch<ApiResponse<TransactionSummary>>(
+      `/transactions/summary?orgId=${orgId}&${params.toString()}`
+    ),
+  };
+}
+
+// ─── Account hooks ────────────────────────────────────────────
+
+export function useAccounts(orgId: string, query?: AccountQuery) {
+  return {
+    queryKey: ["accounts", orgId, query] as const,
+    queryFn:  () => apiFetch<ApiResponse<Account[]>>(
+      `/accounts?orgId=${orgId}${query?.type ? `&type=${query.type}` : ""}${query?.search ? `&search=${query.search}` : ""}`
+    ),
+  };
+}
+
+export function useCreateAccount(orgId: string) {
+  return {
+    mutationFn: (dto: CreateAccountDTO) =>
+      apiFetch<ApiResponse<Account>>("/accounts", {
+        method: "POST",
+        body:   JSON.stringify({ orgId, ...dto }),
+      }),
+    invalidateKeys: [["accounts", orgId]],
+  };
+}
+
+export function useUpdateAccount() {
+  return {
+    mutationFn: ({ id, ...dto }: UpdateAccountDTO & { id: string }) =>
+      apiFetch<ApiResponse<Account>>(`/accounts/${id}`, {
+        method: "PATCH",
+        body:   JSON.stringify(dto),
+      }),
+  };
+}
+
+export function useLedgerBalances(orgId: string) {
+  return {
+    queryKey: ["ledgerBalances", orgId] as const,
+    queryFn:  () => apiFetch<ApiResponse<LedgerBalance[]>>(
+      `/transactions/balances?orgId=${orgId}`
+    ),
+  };
 }

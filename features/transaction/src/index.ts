@@ -1,10 +1,30 @@
-// Task 3: Transaction Feature - Double-Entry Ledger, Approvals, Reconciliation
-// Public API surface.
+// ─────────────────────────────────────────────────────────────
+// Task 3: Transaction Feature — Public API Surface
+// ─────────────────────────────────────────────────────────────
+// Other features / apps import ONLY from this file.
+// e.g.  import { TransactionService } from "@tokens-taken/feature-transaction";
+// ─────────────────────────────────────────────────────────────
 
+// Backend services
+export { TransactionService }   from "./transaction.service";
+export { JournalService }       from "./journal.service";
+export { AccountService }       from "./account.service";
+export { TransactionController } from "./transaction.controller";
+
+// Frontend hooks (React Query configs)
 export {
-  useApproveTransaction,
-  useCreateTransaction,
-  useTransaction,
   useTransactions,
+  useTransaction,
+  useCreateTransaction,
+  useUpdateTransaction,
+  useApproveTransaction,
+  useCancelTransaction,
+  useTransactionSummary,
+  useAccounts,
+  useCreateAccount,
+  useUpdateAccount,
+  useLedgerBalances,
 } from "./api/transaction.hooks";
-export type { UseTransactionsResult } from "./api/transaction.hooks";
+
+// Internal config type
+export type { TransactionModuleConfig } from "./transaction.types";
