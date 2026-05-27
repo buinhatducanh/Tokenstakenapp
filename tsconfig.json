@@ -1,14 +1,23 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "skipLibCheck": true,
+    "exactOptionalPropertyTypes": false,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "types": ["vite/client"]
   },
   "include": [
     "src/**/*",
     "features/**/*",
     "packages/**/*",
-    "apps/**/*"
+    "apps/**/*",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/app/components/ui"
   ]
 }
