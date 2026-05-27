@@ -36,7 +36,7 @@ export function Invoices() {
         number: `INV-NEW-${Math.floor(Math.random() * 1000)}`,
         partner: "Extracted Partner " + (i + 1),
         amount: Math.floor(Math.random() * 5000) + 100,
-        date: new Date().toISOString().split('T')[0],
+        date: new Date().toISOString().split("T")[0] ?? new Date().toISOString(),
         status: "PENDING_APPROVAL",
       }));
       setInvoices(prev => [...newInvoices, ...prev]);
