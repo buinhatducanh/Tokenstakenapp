@@ -5,13 +5,15 @@
     "exactOptionalPropertyTypes": false,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowImportingTsExtensions": true,
     "types": ["vite/client"]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "vite.config.ts",
-    "packages/db/prisma/seed.ts"
+    "src/**/*",
+    "features/**/*",
+    "packages/**/*",
+    "apps/**/*",
+    "vite.config.ts"
   ],
   "exclude": [
     "node_modules",

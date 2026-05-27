@@ -42,7 +42,14 @@
     "vite": "^5.4.11",
     "vitest": "^2.1.8"
   },
-  "pnpm": {},
+  "prisma": {
+    "schema": "packages/db/prisma/schema.prisma"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "6.3.5"
+    }
+  },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
