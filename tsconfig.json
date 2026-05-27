@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "exactOptionalPropertyTypes": false,
+    "jsx": "react-jsx",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["vite/client"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "vite.config.ts",
+    "packages/db/prisma/seed.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/app/components/ui"
+  ]
+}
