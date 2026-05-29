@@ -43,6 +43,10 @@ export default function LoginView() {
     useState("");
 
 
+  const [redirecting, setRedirecting] =
+    useState(false);
+
+
   // const handleSend = async () => {
   //   if (
   //     !isValidEmail(email) ||
@@ -126,33 +130,37 @@ export default function LoginView() {
   //   }
   // };
   const handleLogin = async () => {
-
-    if (!token) {
-      setErrorMessage("Token is required");
-      return;
-    }
+    if (!token) return;
 
     try {
-
-      setErrorMessage("");
       setIsLoading(true);
 
-      const res = await verifyMagicLink(email, token);
+      const res =
+        await verifyMagicLink(
+          email,
+          token,
+        );
 
-      router.replace(
-        res.role === "ADMIN" || res.role === "OWNER"
-          ? "/admin"
-          : "/user"
-      );
+      if (res?.accessToken) {
 
-    } catch (err: any) {
-      console.log("LOGIN ERROR:", err?.response?.data);
-     setErrorMessage(
-  err?.message ||
-  err?.error ||
-  "Đăng nhập thất bại!"
-);
+        // 🔥 hiện loading chuyển trang
+        setRedirecting(true);
 
+        setTimeout(() => {
+          router.replace(
+            res.role === "ADMIN" ||
+              res.role === "OWNER"
+              ? "/admin"
+              : "/user",
+          );
+        }, 800);
+
+      } else {
+        alert("Token không hợp lệ!");
+      }
+
+    } catch (err) {
+      alert("Đăng nhập thất bại!");
     } finally {
       setIsLoading(false);
     }
@@ -260,34 +268,7 @@ export default function LoginView() {
               bạn.
             </p>
 
-            {/* TOKEN */}
-            {/*  <div className="input-group">
-              <label>
-                Nhập Token
-              </label>
 
-              <div className="input-wrapper">
-                <KeyRound
-                  className="input-icon"
-                  size={20}
-                />
-
-                <input
-                  type="text"
-                  className="input-field"
-                  value={token}
-                  onChange={(e) =>
-
-                    setToken(
-                      e.target.value.trim(),
-                    )
-
-
-                  }
-                  placeholder="Nhập token"
-                />
-              </div>
-            </div>*/}
 
             <div className="input-group">
 
@@ -332,28 +313,6 @@ export default function LoginView() {
               }
 
             </div>
-            {/* LOGIN BUTTON */}
-            {/* <button
-              className="login-button"
-              disabled={
-                !token || isLoading
-              }
-              onClick={
-                handleLogin
-              }
-            >
-              {isLoading ? (
-                <>
-                  <Loader2
-                    className="spin"
-                    size={22}
-                  />
-                  Đang xác thực...
-                </>
-              ) : (
-                "Đăng nhập"
-              )}
-            </button> */}
 
             <button
               className="login-button"
@@ -372,10 +331,40 @@ export default function LoginView() {
                 "Đăng nhập"
               )}
             </button>
+
+            {/* <button
+              className="login-button"
+              disabled={!isValidEmail(email) || isLoading}
+              onClick={handleSend}
+            >
+              {isLoading ? (
+                <span className="btn-content">
+                  <Loader2 className="spin" size={22} />
+                  Đang gửi...
+                </span>
+              ) : (
+                <span className="btn-content">
+                  Gửi Magic Link
+                </span>
+              )}
+            </button> */}
           </>
         )}
       </div>
+      {
+        redirecting && (
+          <div className="redirect-loading">
+            <Loader2
+              className="redirect-spin"
+              size={50}
+            />
 
+            <p>
+              Đang chuyển trang...
+            </p>
+          </div>
+        )
+      }
       {/* ==================== CSS ==================== */}
       <style jsx global>{`
         .login-container {
@@ -473,17 +462,26 @@ export default function LoginView() {
         }
 
         .login-button {
-          width: 100%;
-          padding: 16px;
-          font-size: 17px;
-          font-weight: 600;
-          border: none;
-          border-radius: 9999px;
-          background: linear-gradient(90deg, #3b82f6, #60a5fa);
-          color: white;
-          cursor: pointer;
-          margin-top: 8px;
-        }
+  width: 100%;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  color: white;
+  cursor: pointer;
+  margin-top: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  line-height: 1;
+  font-family: inherit;
+  min-height: 52px; /* giữ chiều cao cố định */
+}
 
         .login-button:hover:not(:disabled) {
           transform: translateY(-2px);
@@ -508,6 +506,36 @@ export default function LoginView() {
           padding: 12px;
           border-radius: 12px;
         }
+
+        .btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+
+.redirect-loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.redirect-spin {
+  animation: spin 1s linear infinite;
+  margin-bottom: 18px;
+}
       `}</style>
     </div>
   );
