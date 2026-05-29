@@ -1,13 +1,58 @@
+// {
+//   "$schema": "https://json-schema.org/draft-07/schema#",
+//   "compilerOptions": {
+//     "target": "ES2022",
+//     "module": "ESNext",
+//     "moduleResolution": "bundler",
+//     "lib": ["ES2022"],
+//     "declaration": true,
+//     "declarationMap": true,
+//     "sourceMap": true,
+//     "strict": true,
+//     "noUncheckedIndexedAccess": true,
+//     "exactOptionalPropertyTypes": true,
+//     "noImplicitReturns": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "noImplicitOverride": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "skipLibCheck": true,
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "resolveJsonModule": true,
+//     "isolatedModules": true,
+//     "paths": {
+//       "@features/auth":           ["./features/auth/src/index.ts"],
+//       "@features/invoice":         ["./features/invoice/src/index.ts"],
+//       "@features/transaction":     ["./features/transaction/src/index.ts"],
+//       "@features/dashboard":        ["./features/dashboard/src/index.ts"],
+//       "@features/command-palette":  ["./features/command-palette/src/index.ts"],
+//       "@features/reports":         ["./features/reports/src/index.ts"],
+//       "@packages/shared-types":     ["./packages/shared-types/src/index.ts"],
+//       "@packages/common-utils":     ["./packages/common-utils/src/index.ts"]
+//     }
+//   }
+// }
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022"],
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "jsx": "react-jsx",
+    "baseUrl": "../../",
+    "paths": {
+      "@features/*": [
+        "features/*/src"
+      ],
+      "@packages/*": [
+        "packages/*/src"
+      ]
+    },
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -20,15 +65,29 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "paths": {
-      "@features/auth":           ["./features/auth/src/index.ts"],
-      "@features/invoice":         ["./features/invoice/src/index.ts"],
-      "@features/transaction":     ["./features/transaction/src/index.ts"],
-      "@features/dashboard":        ["./features/dashboard/src/index.ts"],
-      "@features/command-palette":  ["./features/command-palette/src/index.ts"],
-      "@features/reports":         ["./features/reports/src/index.ts"],
-      "@packages/shared-types":     ["./packages/shared-types/src/index.ts"],
-      "@packages/common-utils":     ["./packages/common-utils/src/index.ts"]
-    }
-  }
+    "noEmit": true,
+    "incremental": true,
+    "types": [
+      "react",
+      "react-dom",
+      "node"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "features/**/*.ts",
+    "features/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
