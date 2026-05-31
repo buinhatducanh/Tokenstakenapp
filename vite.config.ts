@@ -33,6 +33,7 @@ export default defineConfig({
       '@features/invoice': path.resolve(__dirname, './features/invoice/src/index.ts'),
       '@features/transaction': path.resolve(__dirname, './features/transaction/src/index.ts'),
       '@features/dashboard': path.resolve(__dirname, './features/dashboard/src/index.ts'),
+      '@features/reports': path.resolve(__dirname, './features/reports/src/client/index.ts'),
       '@packages/shared-types': path.resolve(__dirname, './packages/shared-types/src/index.ts'),
     },
   },

@@ -15,6 +15,9 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "paths": {
+      "@features/reports": ["../../features/reports/src/index.ts"],
+      "@features/reports/server": ["../../features/reports/src/server/index.ts"],
+      "@packages/shared-types": ["../../packages/shared-types/src/index.ts"],
       "@tokens-taken/shared-types": ["../../packages/shared-types/src/index.ts"],
       "@tokens-taken/common-utils": ["../../packages/common-utils/src/index.ts"],
       "@tokens-taken/db": ["../../packages/db/src/index.ts"],
