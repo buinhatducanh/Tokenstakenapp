@@ -26,7 +26,7 @@
       "@features/transaction":     ["./features/transaction/src/index.ts"],
       "@features/dashboard":        ["./features/dashboard/src/index.ts"],
       "@features/command-palette":  ["./features/command-palette/src/index.ts"],
-      "@features/reports":         ["./features/reports/src/index.ts"],
+      "@features/reports":         ["./features/reports/src/client/index.ts"],
       "@packages/shared-types":     ["./packages/shared-types/src/index.ts"],
       "@packages/common-utils":     ["./packages/common-utils/src/index.ts"]
     }

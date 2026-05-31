@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
-import { TransactionModule } from './transaction.module';
+import { Module } from "@nestjs/common";
+import { TransactionModule } from "./transaction.module";
+import { ReportsModule } from "./reports.module";
 
 @Module({
-  imports: [TransactionModule],
+  imports: [TransactionModule, ReportsModule],
   controllers: [],
   providers: [],
 })
