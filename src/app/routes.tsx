@@ -6,6 +6,7 @@ import { Invoices } from "./pages/Invoices";
 import { CreateMockData } from "./pages/CreateMockData";
 
 import { Transactions } from "./pages/Transactions";
+import { Reports } from "./pages/Reports";
 
 // Placeholder component
 export const Placeholder = ({ title }: { title: string }) => (
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
       { path: "invoices/new", Component: CreateMockData },
       { path: "transactions", Component: Transactions },
       { path: "transactions/new", Component: CreateMockData },
-      { path: "reports", Component: () => <Placeholder title="Reports" /> },
+      { path: "reports", Component: Reports },
     ],
   },
 ]);
