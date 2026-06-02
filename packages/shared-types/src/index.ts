@@ -15,6 +15,8 @@ export type {
   InvoiceType,
   CreateInvoiceDTO,
   UpdateInvoiceDTO,
+  LineItem,
+  BulkInvoiceAction,
 } from "./invoice/invoice.types";
 export type {
   Transaction,
