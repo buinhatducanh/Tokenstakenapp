@@ -27,8 +27,10 @@ export type Invoice = {
 
   senderName: string;
   senderTaxCode: string | null;
+  senderAddress: string | null;
   receiverName: string;
   receiverTaxCode: string | null;
+  receiverAddress: string | null;
 
   subtotal: string;
   taxRate: string;
